@@ -1,0 +1,33 @@
+//
+// Typography
+//
+
+$font-size: 12px;
+$line-height: 14px;
+
+
+//
+// Colors
+//
+
+$background-color: #fff;
+$main-color: #000;
+
+
+//
+// Space
+//
+
+// ***
+
+
+//
+//  Breakpoints
+//
+
+$breakpoints: (
+  'small': (max-width: 700px),
+  'medium': (max-width: 1000px),
+  'large': (max-width: 1600px),
+  'short': (max-height: 600px),
+);
