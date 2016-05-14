@@ -65,6 +65,13 @@
   transform: translateX(-50%);
 }
 
+@mixin hide-scroll {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+}
+
 ///
 /// Credit: thoughtbot - http://robots.thoughtbot.com/sasss-content-directive
 ///

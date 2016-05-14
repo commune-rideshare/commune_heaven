@@ -10,6 +10,7 @@ body {
   color: $main-color;
   font-size: $font-size;
   line-height: $line-height;
+  overflow: hidden;
   @include screen-size('small') {}
 }
 
@@ -31,6 +32,61 @@ a {
   position: fixed;
   top: 0;
   left: 0;
+  width: calc(100% - 260px);
+  height: 100%;
+  overflow: hidden;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  background: $overlay-color;
+  z-index: 100;
+}
+
+.container {
+  margin-top: 10%;
+}
+
+.info-box {
+  position: fixed;
+  z-index: 10;
+  width: 260px;
+  right: 0;
+  height: 50%;
+  background: black;
+  padding: 5px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  @include hide-scroll;
+}
+
+.stats {
+  top: 0;
+}
+
+.log {
+  top: 50%;
+  border-top: 1px solid grey;
+}
+
+.panel {
+  margin: 10px;
+  background: grey;
+  padding: 10px;
+  transition: all 0.5s ease;
+  border-radius: 2px;
+}
+
+.origin {
+  background: $origin-color;
+  color: black;
+}
+
+.destination {
+  background: $destination-color;
+  color: black;
 }

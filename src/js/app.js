@@ -8,47 +8,66 @@
   // Require jQuery
   global.$ = require("jquery");
 
-  var shared        = require("./shared"),
-      Chance        = require('chance'),
-      chance        = new Chance(),
-      map           = require("./map");
+  var shared = require("./shared"),
+    map = require("./map"),
+    cities = require("./cities"),
+    Vue = require("vue"),
+    Chance = require('chance'),
+    chance = new Chance();
+
+  function triggerRide() {
+
+    map.directions({
+      latitude: chance.latitude({
+        min: map.bounds._sw.lat,
+        max: map.bounds._ne.lat,
+      }),
+      longitude: chance.longitude({
+        min: map.bounds._sw.lng,
+        max: map.bounds._ne.lng,
+      })
+    }, {
+      latitude: chance.latitude({
+        min: map.bounds._sw.lat,
+        max: map.bounds._ne.lat,
+      }),
+      longitude: chance.longitude({
+        min: map.bounds._sw.lng,
+        max: map.bounds._ne.lng,
+      })
+
+    });
+
+  }
 
   $(function () {
 
-    var hongKong = {
-      center: [114.1771, 22.2926],
-      zoom: 14.11
-    };
+    new Vue({
+      el: '#app',
+      data: {
+        time: 0
+      },
+      methods: {
+        startSimulation: function () {
 
-    map.init(hongKong.center, hongKong.zoom, function () {
+          $('#setup').addClass('hidden');
 
-      map.setBounds();
-      
-      setInterval(function () {
-        
-        map.directions({
-          latitude: chance.latitude({
-            min: map.bounds._sw.lat,
-            max: map.bounds._ne.lat,
-          }),
-          longitude: chance.longitude({
-            min: map.bounds._sw.lng,
-            max: map.bounds._ne.lng,
-          })
-        }, {
-          latitude: chance.latitude({
-            min: map.bounds._sw.lat,
-            max: map.bounds._ne.lat,
-          }),
-          longitude: chance.longitude({
-            min: map.bounds._sw.lng,
-            max: map.bounds._ne.lng,
-          })
+          map.init(cities.maputo, function () {
 
-        });
+            map.setBounds();
 
-      }, 1000);
+            triggerRide();
 
+            setInterval(function () {
+
+              triggerRide();
+
+            }, 7000);
+
+          });
+
+        }
+      }
     });
 
   });

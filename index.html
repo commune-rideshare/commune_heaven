@@ -6,17 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>COMMUNE: heaven</title>
-  
+
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:site" content="@pwr_studio" />
   <meta name="twitter:creator" content="@pwr_studio" />
-  
+
   <meta property="og:title" content="">
   <meta property="og:type" content="website">
   <meta property="og:url" content="">
   <meta property="og:image" content="">
   <meta property="og:description" content="" />
-  
 
   <link href='style.css' rel="stylesheet" type="text/css">
 
@@ -24,8 +23,37 @@
 
 <body>
 
-  <div id='map' class='map'></div>
+  <div id='app'>
+
+    <div id='setup' class='overlay'>
+      
+      <div class='container'>
+        
+        <form class="form-horizontal">
+          <fieldset>
+
+            <!-- Button -->
+            <div class="form-group">
+              <div class="col-md-4">
+                <div id="start" v-on:click="startSimulation" class="btn btn-primary">Start Simulation</div>
+              </div>
+            </div>
+
+          </fieldset>
+        </form>
+
+      </div>
+      
+    </div>
+
+    <div id='log' class='log info-box'></div>
+    
+    <div id='stats' class='stats info-box'></div>
+
+  </div>
   
+  <div id='map' class='map'></div>
+
   <script src='app.min.js'></script>
 
 </body>
