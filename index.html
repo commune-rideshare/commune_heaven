@@ -26,9 +26,9 @@
   <div id='app'>
 
     <div id='setup' class='overlay'>
-      
+
       <div class='container'>
-        
+
         <form class="form-horizontal">
           <fieldset>
 
@@ -43,15 +43,31 @@
         </form>
 
       </div>
-      
+
+    </div>
+
+    <div id='stats' class='stats info-box'>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Validated trips</div>
+        <div class="panel-body">
+          {{completedTrips}}
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Issued shares</div>
+        <div class="panel-body">
+          {{numberOfShares}}
+        </div>
+      </div>
+
     </div>
 
     <div id='log' class='log info-box'></div>
-    
-    <div id='stats' class='stats info-box'></div>
 
   </div>
-  
+
   <div id='map' class='map'></div>
 
   <script src='app.min.js'></script>

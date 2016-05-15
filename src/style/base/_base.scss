@@ -79,14 +79,23 @@ a {
   padding: 10px;
   transition: all 0.5s ease;
   border-radius: 2px;
-}
-
-.origin {
-  background: $origin-color;
-  color: black;
-}
-
-.destination {
-  background: $destination-color;
-  color: black;
+  transition: all 1s ease;
+  .origin {
+    background: $origin-color;
+    color: black;
+  }
+  .destination {
+    background: $destination-color;
+    color: black;
+  }
+  &.complete {
+    transition: all 1s ease;
+    opacity: 0.4;
+    .origin {
+      background: white;
+    }
+    .destination {
+      background: white;
+    }
+  }
 }

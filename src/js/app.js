@@ -9,10 +9,12 @@
   global.$ = require("jquery");
 
   var shared = require("./shared"),
+    ledger = require("./ledger"),
     map = require("./map"),
     cities = require("./cities"),
     Vue = require("vue"),
     Chance = require('chance'),
+    moment = require('moment'),
     chance = new Chance();
 
   function triggerRide() {
@@ -45,10 +47,15 @@
     new Vue({
       el: '#app',
       data: {
-        time: 0
+        time: 0,
+        numberOfShares: 0,
+        completedTrips: 0
       },
       methods: {
         startSimulation: function () {
+
+          var vueObject = this,
+            counter = 0;
 
           $('#setup').addClass('hidden');
 
@@ -62,13 +69,24 @@
 
               triggerRide();
 
-            }, 7000);
+            }, 3000);
+
+            setInterval(function () {
+              
+              console.log(ledger.totalShares);
+
+              vueObject.numberOfShares = ledger.totalShares;
+              vueObject.completedTrips = ledger.totalTrips;
+
+            }, 500);
 
           });
 
         }
       }
     });
+
+    $('#start').click();
 
   });
 

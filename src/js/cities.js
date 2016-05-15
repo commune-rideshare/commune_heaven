@@ -12,7 +12,7 @@ var cities = {
   },
   maputo: {
     center: [32.5676463, -25.9556824],
-    zoom: 14.11
+    zoom: 13.5
   }
 };
 

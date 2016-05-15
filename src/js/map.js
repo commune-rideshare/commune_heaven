@@ -4,20 +4,19 @@
 // Require jQuery
 global.$ = require("jquery");
 
-var shared        = require("./shared"),
-    ledger        = require("./ledger"),
-    // Libraries
-    mapboxgl      = require('mapbox-gl'),
-    Chance        = require('chance'),
-    moment        = require('moment'),
-    chance        = new Chance(),
-    MapboxClient  = require('mapbox');
+var shared = require("./shared"),
+  ledger = require("./ledger"),
+  // Libraries
+  mapboxgl = require('mapbox-gl'),
+  Chance = require('chance'),
+  moment = require('moment'),
+  chance = new Chance(),
+  MapboxClient = require('mapbox'),
+  geohash = require('ngeohash');
 
 require("moment-duration-format");
 
-function addPoint(coordinates, color) {
-
-  var id = chance.guid();
+function addPoint(id, coordinates, color) {
 
   map.map.addSource(id, {
     "type": "geojson",
@@ -40,25 +39,37 @@ function addPoint(coordinates, color) {
     "paint": {
       "circle-radius": 15,
       "circle-color": color,
-      "circle-opacity": 0.7,
       "circle-blur": 0.5
     }
   });
 
 }
 
-function log(data) {
+function log(id, data) {
 
   var endpoints = data.summary.split(',');
 
-  $('#log').prepend('<div class="panel"><div>' + moment().format('HH:mm:ss') + '</div><div class="origin">' + endpoints[0] + '</div><div class="destination">' + endpoints[1] + '</div><div class="distance">' + data.distance + ' meters</div><div class="duration">' + moment.duration(data.duration, 'seconds').format('mm:ss') + '</div></div>');
+  $('#log').prepend('<div id="' 
+                    + id 
+                    + '" class="panel"><div>' 
+                    + moment().format('HH:mm:ss') 
+                    + '</div><div class="origin">' 
+                    + endpoints[0] 
+                    + '</div><div class="destination">' 
+                    + endpoints[1] 
+                    + '</div><div class="distance">' 
+                    + data.distance 
+                    + ' meters</div><div class="duration">' 
+                    + moment.duration(data.duration, 'seconds').format('mm:ss') 
+                    + '</div><div class="shares">'
+                    + data.distance 
+                    + ' shares issued</div></div>');
 
 }
 
-function drawRoute(route) {
+function drawRoute(id, route, duration, distance, originId, destinationId) {
 
-  var id = chance.guid(),
-    data = {
+  var data = {
       "type": "Feature",
       "properties": {},
       "geometry": {
@@ -71,12 +82,16 @@ function drawRoute(route) {
     }),
     i = 0,
     steps = route.coordinates.length,
-    animation = {};
+    animation = {},
+    //    speed = Math.floor(duration / steps),
+    speed = 100,
+    routeColor = "#FF5722",
+    newShares = distance;
+  
+  console.log(newShares);
 
   map.map.addSource(id, source);
-
-  console.log(steps);
-
+  
   map.routes.push(id);
 
   animation = setInterval(function () {
@@ -84,10 +99,22 @@ function drawRoute(route) {
     source.setData(data);
     i++;
     if (i > steps) {
+      $('#' + id).addClass('complete');
       clearInterval(animation);
+      map.map.setPaintProperty(originId, "circle-color", routeColor);
+      map.map.setPaintProperty(originId, "circle-radius", 25);
+      map.map.setPaintProperty(destinationId, "circle-color", routeColor);
+      map.map.setPaintProperty(destinationId, "circle-radius", 25);
+      ledger.totalShares += newShares;
+      ledger.totalTrips++;
+      setTimeout(function(){
+        map.map.removeLayer(id);
+        map.map.removeLayer(originId);
+        map.map.removeLayer(destinationId);
+      }, 1000);
     }
-  }, 100);
-  
+  }, speed);
+
   map.map.addLayer({
     "id": id,
     "type": "line",
@@ -97,23 +124,11 @@ function drawRoute(route) {
       "line-cap": "round"
     },
     "paint": {
-      "line-color": "#FF5722",
+      "line-color": routeColor,
       "line-width": 4,
       "line-opacity": 0.5
     }
   });
-
-//  garbageCollector();
-
-}
-
-function garbageCollector() {
-
-  console.log(map.routes.length);
-
-  while (map.routes.length > 20) {
-    map.map.removeLayer(map.routes.shift());
-  }
 
 }
 
@@ -132,11 +147,7 @@ var map = {
       container: 'map',
       style: 'mapbox://styles/mapbox/dark-v8',
       center: city.center,
-      zoom: city.zoom,
-      "transition": {
-        "duration": 2000,
-        "delay": 0
-      }
+      zoom: city.zoom
     });
 
     this.map.on('load', function () {
@@ -148,16 +159,30 @@ var map = {
 
     this.mapboxClient.getDirections([start, end],
       function (err, res) {
+      
+      var origin            = [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
+          destination       = [res.destination.geometry.coordinates[0], res.destination.geometry.coordinates[1]],
+          distance          = res.routes[0].distance,
+          duration          = res.routes[0].duration,         
+          routeId           = chance.guid(),
+          originId          = chance.guid(),
+          destinationId     = chance.guid();
+      
+        console.log(res);
 
-        addPoint([res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]], '#FFC107');
-        addPoint([res.destination.geometry.coordinates[0], res.destination.geometry.coordinates[1]], '#009688');
+        addPoint(originId, origin, '#FFC107');
+        addPoint(destinationId, destination, '#009688');
+      
+        drawRoute(routeId, res.routes[0].geometry, distance, duration, originId, destinationId);
+      
+        ledger.addEntry(routeId, 
+              0, 
+              geohash.encode(res.origin.geometry.coordinates[1], res.origin.geometry.coordinates[0]), 
+              geohash.encode(res.destination.geometry.coordinates[1], res.destination.geometry.coordinates[0]), 
+              distance, 
+              duration);
 
-        drawRoute(res.routes[0].geometry);
-
-        log(res.routes[0]);
-
-        console.log(res.routes[0]);
-
+        log(routeId, res.routes[0]);
 
       });
 
