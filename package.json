@@ -31,6 +31,7 @@
     "imagemin-pngquant": "^4.2.0"
   },
   "dependencies": {
+    "bootstrap": "^3.3.6",
     "bootstrap-sass": "^3.3.6",
     "browserify": "^13.0.0",
     "browsernizr": "^2.1.0",
@@ -52,9 +53,11 @@
     "ngeohash": "^0.6.0",
     "swiper": "^3.3.1",
     "ttf2woff2": "^2.0.3",
+    "turf": "^3.0.5",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "vinyl-transform": "^1.0.0",
-    "vue": "^1.0.24"
+    "vue": "^1.0.24",
+    "vue-ui": "^0.1.3"
   }
 }

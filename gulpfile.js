@@ -23,11 +23,10 @@ gulp.task('scripts', function () {
   return browserify('./src/js/app.js', {
       debug: true
     })
-    .transform(hbsfy)
     .bundle()
     .pipe(source('app.min.js'))
     .pipe(buffer())
-//    .pipe(uglify())
+    //    .pipe(uglify())
     .pipe(gulp.dest('./'))
     .pipe(browserSync.stream());
 

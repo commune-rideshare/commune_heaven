@@ -6,36 +6,36 @@
   "use strict";
 
   // Require jQuery
-  global.$ = require("jquery");
+  window.jQuery = global.$ = require('jquery');
 
-  var shared = require("./shared"),
-    ledger = require("./ledger"),
-    map = require("./map"),
-    cities = require("./cities"),
-    Vue = require("vue"),
-    Chance = require('chance'),
-    moment = require('moment'),
-    chance = new Chance();
+  var config = require("./config"),
+      ledger = require("./ledger"),
+      city = require("./city"),
+      draw = require("./draw"),
+      cities = require("./cities"),
+      Vue = require("vue"),
+      Chance = require('chance'),
+      chance = new Chance();
 
   function triggerRide() {
 
-    map.directions({
+    city.directions({
       latitude: chance.latitude({
-        min: map.bounds._sw.lat,
-        max: map.bounds._ne.lat,
+        min: city.bounds._sw.lat,
+        max: city.bounds._ne.lat,
       }),
       longitude: chance.longitude({
-        min: map.bounds._sw.lng,
-        max: map.bounds._ne.lng,
+        min: city.bounds._sw.lng,
+        max: city.bounds._ne.lng,
       })
     }, {
       latitude: chance.latitude({
-        min: map.bounds._sw.lat,
-        max: map.bounds._ne.lat,
+        min: city.bounds._sw.lat,
+        max: city.bounds._ne.lat,
       }),
       longitude: chance.longitude({
-        min: map.bounds._sw.lng,
-        max: map.bounds._ne.lng,
+        min: city.bounds._sw.lng,
+        max: city.bounds._ne.lng,
       })
 
     });
@@ -49,32 +49,35 @@
       data: {
         time: 0,
         numberOfShares: 0,
-        completedTrips: 0
+        completedTrips: 0,
+        citiesOptions: cities
       },
       methods: {
         startSimulation: function () {
+
+          console.log(city);
 
           var vueObject = this,
             counter = 0;
 
           $('#setup').addClass('hidden');
 
-          map.init(cities.maputo, function () {
+          city.init(cities[2], function () {
 
-            map.setBounds();
+            city.drivers.forEach(function (driver) {
+              console.log(driver);
+//              draw.point(driver.id, driver.position, '#F00');
+              draw.driver(driver);
+            });
 
-            triggerRide();
-
-            setInterval(function () {
-
-              triggerRide();
-
-            }, 3000);
+            city.riders.forEach(function (rider) {
+              console.log(rider);
+//            draw.point(rider.id, rider.position, '#00F');
+              draw.rider(rider);
+            });
 
             setInterval(function () {
               
-              console.log(ledger.totalShares);
-
               vueObject.numberOfShares = ledger.totalShares;
               vueObject.completedTrips = ledger.totalTrips;
 

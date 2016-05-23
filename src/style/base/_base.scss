@@ -64,6 +64,32 @@ a {
   @include hide-scroll;
 }
 
+.drivers {
+  position: fixed;
+  z-index: 10;
+  width: 200px;
+  left: 0;
+  height: 100%;
+  background: black;
+  padding: 5px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  @include hide-scroll;
+}
+
+.riders {
+  position: fixed;
+  z-index: 10;
+  width: 200px;
+  left: 200px;
+  height: 100%;
+  background: black;
+  padding: 5px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  @include hide-scroll;
+}
+
 .stats {
   top: 0;
 }
