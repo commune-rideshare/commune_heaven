@@ -16,7 +16,12 @@ var cities = [
     text: 'Maputo',
     value: 'maputo',
     center: [32.5676463, -25.9556824],
-    zoom: 13.5
+    zoom: 15.5
+  }, {
+    text: 'Amsterdam',
+    value: 'amsterdam',
+    center: [4.8574038, 52.3561256],
+    zoom: 15
   }
 ];
 

@@ -2,16 +2,16 @@
 /*global $, jQuery*/
 
 var config = require("./config"),
-    ledger = require("./ledger"),
-    driver = require("./driver"),
-    rider = require("./rider"),
-    draw = require("./draw"),
-    mapboxgl = require('mapbox-gl'),
-    MapboxClient = require('mapbox'),
-    turf = require('turf'),
-    Chance = require('chance'),
-    chance = new Chance(),
-    geohash = require('ngeohash');
+  ledger = require("./ledger"),
+  driver = require("./driver"),
+  rider = require("./rider"),
+  //  draw = require("./draw"),
+  mapboxgl = require('mapbox-gl'),
+  MapboxClient = require('mapbox'),
+  turf = require('turf'),
+  Chance = require('chance'),
+  chance = new Chance(),
+  geohash = require('ngeohash');
 
 var city = {
   map: {},
@@ -86,65 +86,65 @@ var city = {
   },
   init: function init(city, cb) {
 
-    var parent = this;
+      var parent = this;
 
-    mapboxgl.accessToken = config.key;
+      mapboxgl.accessToken = config.key;
 
-    this.mapboxClient = new MapboxClient(config.key);
+      this.mapboxClient = new MapboxClient(config.key);
 
-    this.map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/dark-v8',
-      center: city.center,
-      zoom: city.zoom
-    });
+      this.map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v8',
+        center: city.center,
+        zoom: city.zoom
+      });
 
-    this.bounds = this.map.getBounds();
-    this.map.setMaxBounds(this.bounds);
+      this.bounds = this.map.getBounds();
+      this.map.setMaxBounds(this.bounds);
 
-    this.spawnDrivers(10);
-    this.spawnRiders(20);
+      this.spawnDrivers(10);
+      this.spawnRiders(20);
 
-    this.map.on('load', function () {
+      this.map.on('load', function () {
 
-      console.log(parent.riders);
-      console.log(parent.drivers);
+        console.log(parent.riders);
+        console.log(parent.drivers);
 
-      cb();
-
-    });
-
-  },
-  directions: function directions(start, end) {
-
-    this.mapboxClient.getDirections([start, end],
-      function (err, res) {
-
-        var origin = [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
-          destination = [res.destination.geometry.coordinates[0], res.destination.geometry.coordinates[1]],
-          duration = res.routes[0].duration,
-          distance = res.routes[0].distance,
-          routeId = chance.guid(),
-          originId = chance.guid(),
-          destinationId = chance.guid();
-
-        draw.point(originId, origin, '#FFC107');
-        draw.point(destinationId, destination, '#009688');
-
-        draw.route(routeId, res.routes[0].geometry, duration, distance, originId, destinationId);
-
-        ledger.addEntry(routeId,
-          0,
-          geohash.encode(res.origin.geometry.coordinates[1], res.origin.geometry.coordinates[0]),
-          geohash.encode(res.destination.geometry.coordinates[1], res.destination.geometry.coordinates[0]),
-          distance,
-          duration);
-
-        draw.log(routeId, res.routes[0]);
+        cb();
 
       });
 
-  }
+    }
+    //  directions: function directions(start, end) {
+    //
+    //    this.mapboxClient.getDirections([start, end],
+    //      function (err, res) {
+    //
+    //        var origin = [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
+    //          destination = [res.destination.geometry.coordinates[0], res.destination.geometry.coordinates[1]],
+    //          duration = res.routes[0].duration,
+    //          distance = res.routes[0].distance,
+    //          routeId = chance.guid(),
+    //          originId = chance.guid(),
+    //          destinationId = chance.guid();
+    //
+    //        draw.point(originId, origin, '#FFC107');
+    //        draw.point(destinationId, destination, '#009688');
+    //
+    //        draw.route(routeId, res.routes[0].geometry, duration, distance, originId, destinationId);
+    //
+    //        ledger.addEntry(routeId,
+    //          0,
+    //          geohash.encode(res.origin.geometry.coordinates[1], res.origin.geometry.coordinates[0]),
+    //          geohash.encode(res.destination.geometry.coordinates[1], res.destination.geometry.coordinates[0]),
+    //          distance,
+    //          duration);
+    //
+    //        draw.log(routeId, res.routes[0]);
+    //
+    //      });
+    //
+    //  }
 };
 
 module.exports = city;

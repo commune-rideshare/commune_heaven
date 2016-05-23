@@ -9,13 +9,13 @@
   window.jQuery = global.$ = require('jquery');
 
   var config = require("./config"),
-      ledger = require("./ledger"),
-      city = require("./city"),
-      draw = require("./draw"),
-      cities = require("./cities"),
-      Vue = require("vue"),
-      Chance = require('chance'),
-      chance = new Chance();
+    ledger = require("./ledger"),
+    city = require("./city"),
+    draw = require("./draw"),
+    cities = require("./cities"),
+    Vue = require("vue"),
+    Chance = require('chance'),
+    chance = new Chance();
 
   function triggerRide() {
 
@@ -62,22 +62,22 @@
 
           $('#setup').addClass('hidden');
 
-          city.init(cities[2], function () {
+          city.init(cities[3], function () {
 
             city.drivers.forEach(function (driver) {
               console.log(driver);
-//              draw.point(driver.id, driver.position, '#F00');
+              draw.point(driver.id, driver.position, '#F00');
               draw.driver(driver);
             });
 
             city.riders.forEach(function (rider) {
               console.log(rider);
-//            draw.point(rider.id, rider.position, '#00F');
+              draw.point(rider.id, rider.position, '#00F');
               draw.rider(rider);
             });
 
             setInterval(function () {
-              
+
               vueObject.numberOfShares = ledger.totalShares;
               vueObject.completedTrips = ledger.totalTrips;
 

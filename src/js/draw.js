@@ -13,8 +13,8 @@ require("moment-duration-format");
 
 var draw = {
   point: function point(id, coordinates, color) {
-
-    console.log(city);
+    
+    console.log(id);
 
     city.map.addSource(id, {
       "type": "geojson",
