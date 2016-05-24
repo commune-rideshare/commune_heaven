@@ -8,14 +8,28 @@
   // Require jQuery
   window.jQuery = global.$ = require('jquery');
 
-  var config = require("./config"),
-    ledger = require("./ledger"),
-    city = require("./city"),
-    draw = require("./draw"),
-    cities = require("./cities"),
-    Vue = require("vue"),
-    Chance = require('chance'),
-    chance = new Chance();
+  var config        = require("./config"),
+      ledger        = require("./ledger"),
+      city          = require("./city"),
+      draw          = require("./draw"),
+      cities        = require("./cities"),
+      Vue           = require("vue"),
+      Chance        = require('chance'),
+      chance        = new Chance();
+
+  function getRandomPoint() {
+
+    var point = [chance.longitude({
+      min: city.bounds._sw.lng,
+      max: city.bounds._ne.lng,
+    }), chance.latitude({
+      min: city.bounds._sw.lat,
+      max: city.bounds._ne.lat,
+    })];
+
+    return point;
+
+  }
 
   function triggerRide() {
 
@@ -55,8 +69,6 @@
       methods: {
         startSimulation: function () {
 
-          console.log(city);
-
           var vueObject = this,
             counter = 0;
 
@@ -65,23 +77,38 @@
           city.init(cities[3], function () {
 
             city.drivers.forEach(function (driver) {
-              console.log(driver);
-              draw.point(driver.id, driver.position, '#F00');
+
+              draw.point(driver.id, driver.point.geometry.coordinates, '#F00');
               draw.driver(driver);
             });
 
             city.riders.forEach(function (rider) {
-              console.log(rider);
-              draw.point(rider.id, rider.position, '#00F');
               draw.rider(rider);
             });
 
+            //            setInterval(function () {
+            //
+            //              vueObject.numberOfShares = ledger.totalShares;
+            //              vueObject.completedTrips = ledger.totalTrips;
+            //
+            //            }, 500);
+
             setInterval(function () {
 
-              vueObject.numberOfShares = ledger.totalShares;
-              vueObject.completedTrips = ledger.totalTrips;
+              var destination     = getRandomPoint(),
+                  rider           = chance.pickone(city.riders);
+              
+              // Hail driver
+              rider.hail(destination);
+              // Activate rider
+              draw.point(rider.id, rider.point.geometry.coordinates, config.riderColor);
+              // Draw destination
+              draw.point(chance.guid(), destination, '#0F0');
 
-            }, 500);
+              //Get closest driver and activate
+              draw.activateDriver(city.getClosestDriver(rider));
+
+            }, 5000);
 
           });
 

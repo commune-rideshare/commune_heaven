@@ -7,14 +7,12 @@ global.$ = require("jquery");
 var ledger        = require("./ledger"),
     mapboxgl      = require('mapbox-gl'),
     moment        = require('moment'),
-    city          = require("./city.js");
+    city          = require("./city");
 
 require("moment-duration-format");
 
 var draw = {
   point: function point(id, coordinates, color) {
-    
-    console.log(id);
 
     city.map.addSource(id, {
       "type": "geojson",
@@ -51,12 +49,12 @@ var draw = {
   },
   driver: function driver(driver) {
 
-    $('#drivers').prepend('<div id="' + driver.id + '" class="panel ' + driver.id + '">' + driver.name + '<span class="label label-default">0</span><span class="label label-success">0</span></div>');
+    $('#drivers').append('<div id="' + driver.id + '" class="panel ' + driver.id + '">' + driver.name + '<span class="label label-default">0</span><span class="label label-success">0</span></div>');
 
   },
   rider: function rider(rider) {
 
-    $('#riders').prepend('<div id="' + rider.id + '" class="panel ' + rider.id + '">' + rider.name + '<span class="label label-default">0</span><span class="label label-success">0</span></div>');
+    $('#riders').append('<div id="' + rider.id + '" class="panel ' + rider.id + '">' + rider.name + '<span class="label label-default">0</span><span class="label label-success">0</span></div>');
 
   },
   route: function route(id, route, duration, distance, originId, destinationId) {
@@ -119,6 +117,10 @@ var draw = {
       }
     });
 
+  },
+  activateDriver: function activateDriver(driverId) {
+    console.log('nearest 2', driverId);
+    city.map.setPaintProperty(driverId, "circle-color", "#fff");
   }
 }
 

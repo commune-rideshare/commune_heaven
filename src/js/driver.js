@@ -3,14 +3,26 @@
 
 "use strict";
 
+var config = require("./config");
+
 function driver(startPosition, id, name) {
 
   return {
-    position: startPosition,
+    point: {
+      "type": "Feature",
+      "properties": {
+        "marker-color": config.driverColor
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": startPosition
+      }
+    },
     id: id,
     name: name,
     shares: 0,
     trips: 0,
+    occupied: false,
     drive: function drive(destination) {},
     pickUp: function pickUp() {},
     dropOff: function dropOff() {}

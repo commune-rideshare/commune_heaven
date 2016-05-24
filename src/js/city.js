@@ -5,7 +5,6 @@ var config = require("./config"),
   ledger = require("./ledger"),
   driver = require("./driver"),
   rider = require("./rider"),
-  //  draw = require("./draw"),
   mapboxgl = require('mapbox-gl'),
   MapboxClient = require('mapbox'),
   turf = require('turf'),
@@ -86,33 +85,59 @@ var city = {
   },
   init: function init(city, cb) {
 
-      var parent = this;
+    var parent = this;
 
-      mapboxgl.accessToken = config.key;
+    mapboxgl.accessToken = config.key;
 
-      this.mapboxClient = new MapboxClient(config.key);
+    this.mapboxClient = new MapboxClient(config.key);
 
-      this.map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/dark-v8',
-        center: city.center,
-        zoom: city.zoom
+    this.map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v8',
+      center: city.center,
+      zoom: city.zoom
+    });
+
+    this.bounds = this.map.getBounds();
+    this.map.setMaxBounds(this.bounds);
+
+    this.spawnDrivers(10);
+    this.spawnRiders(20);
+
+    this.map.on('load', function () {
+      cb();
+    });
+
+  },
+  getClosestDriver: function getClosesDriver(rider) {
+
+      var driverPointCollection = {
+        "type": "FeatureCollection",
+        "features": []
+      };
+
+      this.drivers.forEach(function (driver) {
+        if (driver.occupied === false) {
+          driverPointCollection.features.push(driver.point);
+        }
       });
 
-      this.bounds = this.map.getBounds();
-      this.map.setMaxBounds(this.bounds);
+      console.log(driverPointCollection);
 
-      this.spawnDrivers(10);
-      this.spawnRiders(20);
+      if (driverPointCollection.features.length != 0) {
 
-      this.map.on('load', function () {
+        var nearestDriver = turf.nearest(rider.point, driverPointCollection);
 
-        console.log(parent.riders);
-        console.log(parent.drivers);
+        for (var i = 0, iLen = this.drivers.length; i < iLen; i++) {
+          if (this.drivers[i].point.geometry.coordinates == nearestDriver.geometry.coordinates) {
+            this.drivers[i].occupied = true;
+            return this.drivers[i].id;
+          }
+        }
 
-        cb();
-
-      });
+      } else {
+        console.log('all cars occupied');
+      }
 
     }
     //  directions: function directions(start, end) {
