@@ -22,10 +22,15 @@ function rider(startPosition, id, name) {
     name: name,
     shares: 0,
     trips: 0,
+    waiting: false,
     inTransit: false,
     hail: function hail(destination) {
-//      console.log('name', this.name);
-//      console.log('destination', destination);
+      
+      this.waiting = true;
+      
+      console.log('name', this.name);
+      console.log('destination', destination);
+      
     },
     getOn: function getUp() {},
     getOff: function getOff() {}

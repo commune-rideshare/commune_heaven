@@ -8,53 +8,16 @@
   // Require jQuery
   window.jQuery = global.$ = require('jquery');
 
-  var config        = require("./config"),
-      ledger        = require("./ledger"),
-      city          = require("./city"),
-      draw          = require("./draw"),
-      cities        = require("./cities"),
-      Vue           = require("vue"),
-      Chance        = require('chance'),
-      chance        = new Chance();
+  var config = require("./config"),
+    ledger = require("./ledger"),
+    city = require("./city"),
+    utilities = require("./utilities"),
+    draw = require("./draw"),
+    cities = require("./cities"),
+    Vue = require("vue"),
+    Chance = require('chance'),
+    chance = new Chance();
 
-  function getRandomPoint() {
-
-    var point = [chance.longitude({
-      min: city.bounds._sw.lng,
-      max: city.bounds._ne.lng,
-    }), chance.latitude({
-      min: city.bounds._sw.lat,
-      max: city.bounds._ne.lat,
-    })];
-
-    return point;
-
-  }
-
-  function triggerRide() {
-
-    city.directions({
-      latitude: chance.latitude({
-        min: city.bounds._sw.lat,
-        max: city.bounds._ne.lat,
-      }),
-      longitude: chance.longitude({
-        min: city.bounds._sw.lng,
-        max: city.bounds._ne.lng,
-      })
-    }, {
-      latitude: chance.latitude({
-        min: city.bounds._sw.lat,
-        max: city.bounds._ne.lat,
-      }),
-      longitude: chance.longitude({
-        min: city.bounds._sw.lng,
-        max: city.bounds._ne.lng,
-      })
-
-    });
-
-  }
 
   $(function () {
 
@@ -70,43 +33,71 @@
         startSimulation: function () {
 
           var vueObject = this,
-            counter = 0;
+            counter = 0,
+            closestDriver = {};
 
           $('#setup').addClass('hidden');
 
           city.init(cities[3], function () {
 
+            // Show drivers
             city.drivers.forEach(function (driver) {
-
-              draw.point(driver.id, driver.point.geometry.coordinates, '#F00');
+              // Draw driver on map
+              draw.point(driver.id, driver.point.geometry.coordinates, config.driverColor);
+              // Add driver to table 
               draw.driver(driver);
+
             });
 
+            // Show riders
             city.riders.forEach(function (rider) {
+              // Add rider to table 
               draw.rider(rider);
             });
 
-            //            setInterval(function () {
-            //
-            //              vueObject.numberOfShares = ledger.totalShares;
-            //              vueObject.completedTrips = ledger.totalTrips;
-            //
-            //            }, 500);
+            // Update stats every 0.5s
+            setInterval(function () {
+              vueObject.numberOfShares = ledger.totalShares;
+              vueObject.completedTrips = ledger.totalTrips;
+            }, 500);
 
+            // Generate new ride
             setInterval(function () {
 
-              var destination     = getRandomPoint(),
-                  rider           = chance.pickone(city.riders);
-              
+              var destination = utilities.getRandomPoint(),
+                rider = chance.pickone(city.riders);
+
               // Hail driver
               rider.hail(destination);
               // Activate rider
               draw.point(rider.id, rider.point.geometry.coordinates, config.riderColor);
-              // Draw destination
-              draw.point(chance.guid(), destination, '#0F0');
+              // Draw route to destination
+              city.directions(rider.point.geometry.coordinates, destination, function (route) {
+                console.log('rider route', route);
+                draw.route(route.route, route.routeId, config.emptyRouteColor, false);
+              });
 
-              //Get closest driver and activate
-              draw.activateDriver(city.getClosestDriver(rider));
+              // Find closest driver
+              closestDriver = city.getClosestDriver(rider);
+
+              //Activate closest driver
+              draw.activateDriver(closestDriver.id);
+
+              // Get directions betwwen driver and rider
+              city.directions(closestDriver.point.geometry.coordinates, rider.point.geometry.coordinates, function (route) {
+                console.log('driver route', route);
+                draw.route(route.route, route.routeId, config.pickUpRouteColor, true);
+              });
+
+              //              ledger.addEntry(routeId,
+              //                0,
+              //                geohash.encode(res.origin.geometry.coordinates[1], res.origin.geometry.coordinates[0]),
+              //                geohash.encode(res.destination.geometry.coordinates[1], res.destination.geometry.coordinates[0]),
+              //                distance,
+              //                duration);
+              //
+              //              draw.log(routeId, res.routes[0]);
+
 
             }, 5000);
 
@@ -117,6 +108,11 @@
     });
 
     $('#start').click();
+
+    $(document).on('click', '.info-box', function () {
+      $(this).children('table').slideToggle();
+      //      $(this).toggleClass('active');
+    });
 
   });
 

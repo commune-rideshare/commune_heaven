@@ -23,6 +23,7 @@ function driver(startPosition, id, name) {
     shares: 0,
     trips: 0,
     occupied: false,
+    passengerList: [],
     drive: function drive(destination) {},
     pickUp: function pickUp() {},
     dropOff: function dropOff() {}

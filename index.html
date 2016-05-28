@@ -38,36 +38,39 @@
     </div>
 
     <div id='drivers' class='drivers info-box'>
-      <div class="panel panel-default">
-        <div class="panel-heading">Drivers</div>
-      </div>
+      <div class='btn'>Drivers <span class="caret"></span></div>
+      <table id='drivers-table' class="table table-condensed">
+        <th>Name</th>  
+        <th>Shares</th>  
+      </table>
+    
     </div>
     
     <div id='riders' class='riders info-box'>
-      <div class="panel panel-default">
-        <div class="panel-heading">Riders</div>
-      </div>
+      <div class='btn'>Riders <span class="caret"></span></div>
+      <table id='riders-table' class="table table-condensed">
+        <th>Name</th>  
+        <th>Shares</th>  
+      </table>
     </div>
 
     <div id='stats' class='stats info-box'>
-
-      <div class="panel panel-default">
-        <div class="panel-heading">Validated trips</div>
-        <div class="panel-body">
-          {{completedTrips}}
-        </div>
-      </div>
-
-      <div class="panel panel-default">
-        <div class="panel-heading">Issued shares</div>
-        <div class="panel-body">
-          {{numberOfShares}}
-        </div>
-      </div>
-
+      <div class='btn'>Stats <span class="caret"></span></div>
+      <table class="table table-condensed">
+          <tr>
+            <td>Validated trip</td>  
+            <td>{{completedTrips}}</td>  
+          </tr>          
+          <tr>
+            <td>Issued shares</td>  
+            <td>{{numberOfShares}}</td>  
+          </tr>
+      </table>
     </div>
 
-    <div id='log' class='log info-box'></div>
+    <div id='log' class='log info-box'>
+      <div class='btn'>Log <span class="caret"></span></div>
+    </div>
 
   </div>
 

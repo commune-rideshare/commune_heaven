@@ -85,12 +85,16 @@ var city = {
   },
   init: function init(city, cb) {
 
-    var parent = this;
+    var parent = this,
+      ne = {},
+      sw = {},
+      zoomBounds = {};
 
+    // Initialize the client with API key
     mapboxgl.accessToken = config.key;
-
     this.mapboxClient = new MapboxClient(config.key);
 
+    // Create the map
     this.map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/dark-v8',
@@ -98,10 +102,19 @@ var city = {
       zoom: city.zoom
     });
 
+    // Get viewport boundaries
     this.bounds = this.map.getBounds();
-    this.map.setMaxBounds(this.bounds);
 
+    // Set limit to outward zoom
+    sw = new mapboxgl.LngLat(this.bounds._sw.lng + 0.08, this.bounds._sw.lat + 0.08);
+    ne = new mapboxgl.LngLat(this.bounds._ne.lng - 0.08, this.bounds._ne.lat - 0.08);
+    zoomBounds = new mapboxgl.LngLatBounds(sw, ne);
+    this.map.setMaxBounds(zoomBounds);
+
+    // Create drivers
     this.spawnDrivers(10);
+
+    // Create riders
     this.spawnRiders(20);
 
     this.map.on('load', function () {
@@ -111,65 +124,62 @@ var city = {
   },
   getClosestDriver: function getClosesDriver(rider) {
 
-      var driverPointCollection = {
-        "type": "FeatureCollection",
-        "features": []
-      };
+    var driverPointCollection = {
+      "type": "FeatureCollection",
+      "features": []
+    };
 
-      this.drivers.forEach(function (driver) {
-        if (driver.occupied === false) {
-          driverPointCollection.features.push(driver.point);
+    this.drivers.forEach(function (driver) {
+      if (driver.occupied === false) {
+        driverPointCollection.features.push(driver.point);
+      }
+    });
+
+    console.log(driverPointCollection);
+
+    if (driverPointCollection.features.length != 0) {
+
+      var nearestDriver = turf.nearest(rider.point, driverPointCollection);
+
+      for (var i = 0, iLen = this.drivers.length; i < iLen; i++) {
+        if (this.drivers[i].point.geometry.coordinates == nearestDriver.geometry.coordinates) {
+          this.drivers[i].occupied = true;
+          return this.drivers[i];
         }
-      });
-
-      console.log(driverPointCollection);
-
-      if (driverPointCollection.features.length != 0) {
-
-        var nearestDriver = turf.nearest(rider.point, driverPointCollection);
-
-        for (var i = 0, iLen = this.drivers.length; i < iLen; i++) {
-          if (this.drivers[i].point.geometry.coordinates == nearestDriver.geometry.coordinates) {
-            this.drivers[i].occupied = true;
-            return this.drivers[i].id;
-          }
-        }
-
-      } else {
-        console.log('all cars occupied');
       }
 
+    } else {
+      console.log('all cars occupied');
     }
-    //  directions: function directions(start, end) {
-    //
-    //    this.mapboxClient.getDirections([start, end],
-    //      function (err, res) {
-    //
-    //        var origin = [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
-    //          destination = [res.destination.geometry.coordinates[0], res.destination.geometry.coordinates[1]],
-    //          duration = res.routes[0].duration,
-    //          distance = res.routes[0].distance,
-    //          routeId = chance.guid(),
-    //          originId = chance.guid(),
-    //          destinationId = chance.guid();
-    //
-    //        draw.point(originId, origin, '#FFC107');
-    //        draw.point(destinationId, destination, '#009688');
-    //
-    //        draw.route(routeId, res.routes[0].geometry, duration, distance, originId, destinationId);
-    //
-    //        ledger.addEntry(routeId,
-    //          0,
-    //          geohash.encode(res.origin.geometry.coordinates[1], res.origin.geometry.coordinates[0]),
-    //          geohash.encode(res.destination.geometry.coordinates[1], res.destination.geometry.coordinates[0]),
-    //          distance,
-    //          duration);
-    //
-    //        draw.log(routeId, res.routes[0]);
-    //
-    //      });
-    //
-    //  }
+
+  },
+  directions: function directions(start, end, cb) {
+
+    //    console.log(start[0]);
+    //    console.log(start[1]);
+    //    console.log(end[0]);
+    //    console.log(end[1]);
+
+    this.mapboxClient.getDirections([{
+        latitude: start[1],
+        longitude: start[0]
+      }, {
+        latitude: end[1],
+        longitude: end[0]
+      }],
+      function (err, res) {
+
+        //        console.log(err);
+        //        console.log(res);
+
+        cb({
+          route: res.routes[0],
+          routeId: chance.guid()
+        });
+
+      });
+
+  }
 };
 
 module.exports = city;
