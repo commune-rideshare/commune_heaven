@@ -98,6 +98,7 @@ var city = {
     this.map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/dark-v8',
+      //      style: 'mapbox://styles/mapbox/light-v9',
       center: city.center,
       zoom: city.zoom
     });
@@ -109,13 +110,14 @@ var city = {
     sw = new mapboxgl.LngLat(this.bounds._sw.lng + 0.08, this.bounds._sw.lat + 0.08);
     ne = new mapboxgl.LngLat(this.bounds._ne.lng - 0.08, this.bounds._ne.lat - 0.08);
     zoomBounds = new mapboxgl.LngLatBounds(sw, ne);
-    this.map.setMaxBounds(zoomBounds);
+
+    this.map.setMaxBounds(this.bounds);
 
     // Create drivers
-    this.spawnDrivers(10);
+    this.spawnDrivers(15);
 
     // Create riders
-    this.spawnRiders(20);
+    this.spawnRiders(30);
 
     this.map.on('load', function () {
       cb();
@@ -125,9 +127,10 @@ var city = {
   getClosestDriver: function getClosesDriver(rider) {
 
     var driverPointCollection = {
-      "type": "FeatureCollection",
-      "features": []
-    };
+        "type": "FeatureCollection",
+        "features": []
+      },
+      nearestDriver = {};
 
     this.drivers.forEach(function (driver) {
       if (driver.occupied === false) {
@@ -135,11 +138,9 @@ var city = {
       }
     });
 
-    console.log(driverPointCollection);
-
     if (driverPointCollection.features.length != 0) {
 
-      var nearestDriver = turf.nearest(rider.point, driverPointCollection);
+      nearestDriver = turf.nearest(rider.point, driverPointCollection);
 
       for (var i = 0, iLen = this.drivers.length; i < iLen; i++) {
         if (this.drivers[i].point.geometry.coordinates == nearestDriver.geometry.coordinates) {
@@ -155,26 +156,19 @@ var city = {
   },
   directions: function directions(start, end, cb) {
 
-    //    console.log(start[0]);
-    //    console.log(start[1]);
-    //    console.log(end[0]);
-    //    console.log(end[1]);
-
     this.mapboxClient.getDirections([{
-        latitude: start[1],
-        longitude: start[0]
+        latitude: start.point.geometry.coordinates[1],
+        longitude: start.point.geometry.coordinates[0]
       }, {
-        latitude: end[1],
-        longitude: end[0]
+        latitude: end.point.geometry.coordinates[1],
+        longitude: end.point.geometry.coordinates[0]
       }],
       function (err, res) {
 
-        //        console.log(err);
-        //        console.log(res);
-
         cb({
           route: res.routes[0],
-          routeId: chance.guid()
+          routeId: chance.guid(),
+          driver: start
         });
 
       });

@@ -28,9 +28,6 @@ function rider(startPosition, id, name) {
       
       this.waiting = true;
       
-      console.log('name', this.name);
-      console.log('destination', destination);
-      
     },
     getOn: function getUp() {},
     getOff: function getOff() {}

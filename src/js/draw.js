@@ -4,10 +4,10 @@
 // Require jQuery
 global.$ = require("jquery");
 
-var ledger = require("./ledger"),
-  mapboxgl = require('mapbox-gl'),
-  moment = require('moment'),
-  city = require("./city");
+var ledger      = require("./ledger"),
+    mapboxgl    = require('mapbox-gl'),
+    moment      = require('moment'),
+    city        = require("./city");
 
 require("moment-duration-format");
 
@@ -24,7 +24,7 @@ var draw = {
             "type": "Point",
             "coordinates": coordinates
           }
-      }]
+          }]
       }
     });
 
@@ -41,9 +41,9 @@ var draw = {
 
   },
   log: function log(id, data) {
-    
+
     var endpoints = data.summary.split(',');
-    
+
     $('#log').prepend('<div id="' + id + '" class="panel"><div>' + moment().format('HH:mm:ss') + '</div><div class="origin">' + endpoints[0] + '</div><div class="destination">' + endpoints[1] + '</div><div class="distance">' + data.distance + ' meters</div><div class="duration">' + moment.duration(data.duration, 'seconds').format('mm:ss') + '</div><div class="shares">' + data.distance + ' shares issued</div></div>');
 
   },
@@ -57,78 +57,78 @@ var draw = {
     $('#riders-table').append('<tr id="' + rider.id + '" class="' + rider.id + '"><td>' + rider.name + '</td><td>' + rider.shares + '</td><tr>');
 
   },
-  route: function route(route, id, routeColor, animate) {
+  route: function route(data, cb) {
 
-    console.log(route)
-
-    var data = {
-        "type": "Feature",
-        "properties": {},
-        "geometry": {
-          "type": "LineString",
-          "coordinates": []
-        }
+    var newPosition = {
+        "type": "Point",
+        "coordinates": []
       },
-      source = new mapboxgl.GeoJSONSource({
-        "data": data
-      }),
       i = 0,
-      steps = route.geometry.coordinates.length,
+      steps = data.route.geometry.coordinates.length,
       animation = {},
       speed = 100,
-      newShares = route.distance / 1000;
+      newShares = data.route.distance / 1000;
 
-    city.map.addSource(id, source);
-
-    city.map.addLayer({
-      "id": id,
-      "type": "line",
-      "source": id,
-      "layout": {
-        "line-join": "round",
-        "line-cap": "round"
-      },
-      "paint": {
-        "line-color": routeColor,
-        "line-width": 4,
-        "line-opacity": 0.5
-      }
-    });
-
-    city.routes.push(id);
-
-    if (animate == true) {
+    // Animate route
+    if (data.animate == true) {
 
       animation = setInterval(function () {
-        data.geometry.coordinates = route.geometry.coordinates.slice(0, i);
-        source.setData(data);
+
+        newPosition.coordinates = data.route.geometry.coordinates[i];
+
+        city.map.getSource(data.driver.id).setData(newPosition);
+
         i++;
+
         if (i > steps) {
-          //        $('#' + id).addClass('complete');
           clearInterval(animation);
-          //        city.map.setPaintProperty(originId, "circle-color", routeColor);
-          //        city.map.setPaintProperty(originId, "circle-radius", 25);
-          //        city.map.setPaintProperty(destinationId, "circle-color", routeColor);
-          //        city.map.setPaintProperty(destinationId, "circle-radius", 25);
           ledger.totalShares += newShares;
           ledger.totalTrips++;
           setTimeout(function () {
-            //          city.map.removeLayer(id);
-            //          city.map.removeLayer(originId);
-            //          city.map.removeLayer(destinationId);
+            cb();
           }, 1000);
         }
       }, speed);
 
+    // Draw route without animation
     } else {
-      data.geometry.coordinates = route.geometry.coordinates;
-      source.setData(data);
+
+      var line = {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "LineString",
+            "coordinates": data.route.geometry.coordinates
+          }
+        },
+        source = new mapboxgl.GeoJSONSource({
+          "data": line
+        });
+
+      city.map.addSource(data.routeId, source);
+
+      city.map.addLayer({
+        "id": data.routeId,
+        "type": "line",
+        "source": data.routeId,
+        "layout": {
+          "line-join": "round",
+          "line-cap": "round"
+        },
+        "paint": {
+          "line-color": '#f00',
+          "line-width": 4,
+          "line-opacity": 0.5
+        }
+      });
+
+      cb();
+
     }
 
   },
   activateDriver: function activateDriver(driverId) {
-    console.log('nearest 2', driverId);
-    city.map.setPaintProperty(driverId, "circle-color", "#fff");
+    city.map.setPaintProperty(driverId, "circle-radius", 25);
   }
 }
 

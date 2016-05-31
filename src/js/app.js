@@ -27,7 +27,8 @@
         time: 0,
         numberOfShares: 0,
         completedTrips: 0,
-        citiesOptions: cities
+        citiesOptions: cities,
+        city: ''
       },
       methods: {
         startSimulation: function () {
@@ -37,6 +38,8 @@
             closestDriver = {};
 
           $('#setup').addClass('hidden');
+
+          vueObject.city = cities[3].text;
 
           city.init(cities[3], function () {
 
@@ -55,11 +58,11 @@
               draw.rider(rider);
             });
 
-            // Update stats every 0.5s
+            // Update stats every 1s
             setInterval(function () {
               vueObject.numberOfShares = ledger.totalShares;
               vueObject.completedTrips = ledger.totalTrips;
-            }, 500);
+            }, 1000);
 
             // Generate new ride
             setInterval(function () {
@@ -71,11 +74,6 @@
               rider.hail(destination);
               // Activate rider
               draw.point(rider.id, rider.point.geometry.coordinates, config.riderColor);
-              // Draw route to destination
-              city.directions(rider.point.geometry.coordinates, destination, function (route) {
-                console.log('rider route', route);
-                draw.route(route.route, route.routeId, config.emptyRouteColor, false);
-              });
 
               // Find closest driver
               closestDriver = city.getClosestDriver(rider);
@@ -83,21 +81,38 @@
               //Activate closest driver
               draw.activateDriver(closestDriver.id);
 
-              // Get directions betwwen driver and rider
-              city.directions(closestDriver.point.geometry.coordinates, rider.point.geometry.coordinates, function (route) {
-                console.log('driver route', route);
-                draw.route(route.route, route.routeId, config.pickUpRouteColor, true);
+              // Get directions between driver and rider
+              city.directions(closestDriver, rider, function (route) {
+                
+                // Draw driver trip to rider
+                draw.route({
+                  'route': route.route,
+                  'routeId': route.routeId,
+                  'color': config.pickUpRouteColor,
+                  'animate': true,
+                  'driver': route.driver
+                }, function () {
+                  console.log('Driver arrived');
+
+                  // Draw route to destination
+                  city.directions(rider, destination, function (route) {
+
+                    console.log(route.routeId);
+
+                    draw.route({
+                      'route': route.route,
+                      'routeId': route.routeId,
+                      'color': config.emptyRouteColor,
+                      'animate': false
+                    }, function () {
+                      console.log('dropoff path drawn');
+                    });
+
+                  });
+
+                });
+
               });
-
-              //              ledger.addEntry(routeId,
-              //                0,
-              //                geohash.encode(res.origin.geometry.coordinates[1], res.origin.geometry.coordinates[0]),
-              //                geohash.encode(res.destination.geometry.coordinates[1], res.destination.geometry.coordinates[0]),
-              //                distance,
-              //                duration);
-              //
-              //              draw.log(routeId, res.routes[0]);
-
 
             }, 5000);
 
@@ -108,11 +123,6 @@
     });
 
     $('#start').click();
-
-    $(document).on('click', '.info-box', function () {
-      $(this).children('table').slideToggle();
-      //      $(this).toggleClass('active');
-    });
 
   });
 

@@ -17,6 +17,7 @@
   <meta property="og:image" content="">
   <meta property="og:description" content="" />
 
+  <link href='https://fonts.googleapis.com/css?family=Work+Sans:400,600' rel='stylesheet' type='text/css'>
   <link href='style.css' rel="stylesheet" type="text/css">
 
 </head>
@@ -29,50 +30,45 @@
 
       <div class='container'>
 
-        <!--        <ui-dropdown label="City" options="citiesOptions"></ui-dropdown>-->
-
         <div id="start" v-on:click="startSimulation" class="btn btn-primary">Start Simulation</div>
 
       </div>
 
     </div>
 
-    <div id='drivers' class='drivers info-box'>
-      <div class='btn'>Drivers <span class="caret"></span></div>
-      <table id='drivers-table' class="table table-condensed">
-        <th>Name</th>  
-        <th>Shares</th>  
-      </table>
-    
-    </div>
-    
-    <div id='riders' class='riders info-box'>
-      <div class='btn'>Riders <span class="caret"></span></div>
-      <table id='riders-table' class="table table-condensed">
-        <th>Name</th>  
-        <th>Shares</th>  
-      </table>
-    </div>
-
     <div id='stats' class='stats info-box'>
-      <div class='btn'>Stats <span class="caret"></span></div>
-      <table class="table table-condensed">
-          <tr>
-            <td>Validated trip</td>  
-            <td>{{completedTrips}}</td>  
-          </tr>          
-          <tr>
-            <td>Issued shares</td>  
-            <td>{{numberOfShares}}</td>  
-          </tr>
+      <span>City: <strong>{{city}}</strong></span>
+      <span>Validated trip: <strong>{{completedTrips}}</strong></span>
+      <span>Issued shares: <strong>{{numberOfShares}}</strong></span>
+    </div>
+
+    <div id='drivers' class='drivers info-box'>
+      <div><strong>DRIVERS</strong></div>
+      <table id='drivers-table' class="table table-condensed">
+        <th><strong>Name</strong></th>
+        <th><strong>Shares</strong></th>
       </table>
     </div>
 
-    <div id='log' class='log info-box'>
-      <div class='btn'>Log <span class="caret"></span></div>
+    <div id='riders' class='riders info-box'>
+      <div><strong>PASSENGERS</strong></div>
+      <table id='riders-table' class="table table-condensed">
+        <th><strong>Name</strong></th>
+        <th><strong>Shares</strong></th>
+      </table>
+    </div>
+
+    <div id='rides' class='rides info-box'>
+      <div><strong>JOINT RIDES</strong></div>
+      <table id='riders-table' class="table table-condensed">
+        <th><strong>Name</strong></th>
+        <th><strong>Shares</strong></th>
+      </table>
     </div>
 
   </div>
+  
+  <div class='bar'></div>
 
   <div id='map' class='map'></div>
 

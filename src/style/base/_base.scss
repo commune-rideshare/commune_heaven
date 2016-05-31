@@ -11,6 +11,7 @@ body {
   font-size: $font-size;
   line-height: $line-height;
   overflow: hidden;
+  font-family: 'Work Sans', sans-serif;
   @include screen-size('small') {}
 }
 
@@ -45,6 +46,7 @@ a {
   height: 100%;
   background: $overlay-color;
   z-index: 100;
+  display: none;
 }
 
 .container {
@@ -56,28 +58,67 @@ a {
   z-index: 10;
   width: $panel-width;
   right: 0;
-  height: auto;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 5px;
+  height: 200px;
+  padding: 10px;
+  top: 30px;
+  width: calc(100% / 3);
   overflow-x: hidden;
   overflow-y: scroll;
+  opacity: 0.9;
   @include hide-scroll;
   &.active {
-      height: 100%;
-
+    height: 100%;
   }
 }
 
 .drivers {
   left: 0;
+  background: $driver-color;
+  color: black !important;
 }
 
 .riders {
-  left: $panel-width;
+  //  left: $panel-width;
+  left: calc(100% / 3);
+  background: $passenger-color;
+  color: black !important;
+}
+
+.rides {
+  //  left: 2 * $panel-width;
+  left: calc(100% / 1.5);
+  background: $joint-color;
+  color: black !important;
 }
 
 .stats {
-  right: $panel-width;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 30px;
+  width: 100%;
+  background: black;
+  display: block;
+  opacity: 1;
+  span {
+    margin-right: 100px;
+    float: left;
+  }
+}
+
+.bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 30px;
+  width: 100%;
+  background: white;
+  display: block;
+  opacity: 1;
+  span {
+    margin-right: 100px;
+    float: left;
+  }
 }
 
 .log {
@@ -111,6 +152,6 @@ a {
   }
 }
 
-table {
-  display: none;
-}
+//table {
+//  display: none;
+//}
