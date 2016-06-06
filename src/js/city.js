@@ -2,7 +2,6 @@
 /*global $, jQuery*/
 
 var config = require("./config"),
-  ledger = require("./ledger"),
   driver = require("./driver"),
   rider = require("./rider"),
   mapboxgl = require('mapbox-gl'),
@@ -98,7 +97,6 @@ var city = {
     this.map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/dark-v8',
-      //      style: 'mapbox://styles/mapbox/light-v9',
       center: city.center,
       zoom: city.zoom
     });
@@ -111,10 +109,10 @@ var city = {
     ne = new mapboxgl.LngLat(this.bounds._ne.lng - 0.08, this.bounds._ne.lat - 0.08);
     zoomBounds = new mapboxgl.LngLatBounds(sw, ne);
 
-    this.map.setMaxBounds(this.bounds);
+    //    this.map.setMaxBounds(this.bounds);
 
     // Create drivers
-    this.spawnDrivers(15);
+    this.spawnDrivers(10);
 
     // Create riders
     this.spawnRiders(30);
@@ -132,6 +130,7 @@ var city = {
       },
       nearestDriver = {};
 
+    // Make a collection of all drivers that are not currently occupied
     this.drivers.forEach(function (driver) {
       if (driver.occupied === false) {
         driverPointCollection.features.push(driver.point);
@@ -143,14 +142,12 @@ var city = {
       nearestDriver = turf.nearest(rider.point, driverPointCollection);
 
       for (var i = 0, iLen = this.drivers.length; i < iLen; i++) {
-        if (this.drivers[i].point.geometry.coordinates == nearestDriver.geometry.coordinates) {
-          this.drivers[i].occupied = true;
-          return this.drivers[i];
+        if (this.drivers[i].point.geometry.coordinates === nearestDriver.geometry.coordinates) {
+          return i;
         }
       }
-
     } else {
-      console.log('all cars occupied');
+      return('-1');
     }
 
   },

@@ -37,15 +37,16 @@
     </div>
 
     <div id='stats' class='stats info-box'>
-      <span>City: <strong>{{city}}</strong></span>
-      <span>Validated trip: <strong>{{completedTrips}}</strong></span>
-      <span>Issued shares: <strong>{{numberOfShares}}</strong></span>
+      <div>City: <strong><span id='city'></span></strong></div>
+      <div>Validated trip: <strong><span id='total-trips'>0</span></strong></div>
+      <div>Issued shares: <strong><span id='total-shares'>0</span></strong></div>
     </div>
 
     <div id='drivers' class='drivers info-box'>
       <div><strong>DRIVERS</strong></div>
       <table id='drivers-table' class="table table-condensed">
         <th><strong>Name</strong></th>
+        <th><strong>Trips</strong></th>
         <th><strong>Shares</strong></th>
       </table>
     </div>
@@ -54,6 +55,7 @@
       <div><strong>PASSENGERS</strong></div>
       <table id='riders-table' class="table table-condensed">
         <th><strong>Name</strong></th>
+        <th><strong>Trips</strong></th>
         <th><strong>Shares</strong></th>
       </table>
     </div>
@@ -61,7 +63,8 @@
     <div id='rides' class='rides info-box'>
       <div><strong>JOINT RIDES</strong></div>
       <table id='riders-table' class="table table-condensed">
-        <th><strong>Name</strong></th>
+        <th><strong>ID</strong></th>
+        <th><strong>Distance</strong></th>
         <th><strong>Shares</strong></th>
       </table>
     </div>
@@ -72,6 +75,8 @@
 
   <div id='map' class='map'></div>
 
+  <script src='bower_components/jquery/dist/jquery.min.js'></script>
+  <script src='bower_components/notifyjs/dist/notify.js'></script>
   <script src='app.min.js'></script>
 
 </body>

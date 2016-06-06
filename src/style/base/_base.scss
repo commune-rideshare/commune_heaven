@@ -100,7 +100,8 @@ a {
   background: black;
   display: block;
   opacity: 1;
-  span {
+  div {
+    display: inline;
     margin-right: 100px;
     float: left;
   }

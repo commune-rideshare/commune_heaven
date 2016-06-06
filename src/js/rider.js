@@ -23,14 +23,7 @@ function rider(startPosition, id, name) {
     shares: 0,
     trips: 0,
     waiting: false,
-    inTransit: false,
-    hail: function hail(destination) {
-      
-      this.waiting = true;
-      
-    },
-    getOn: function getUp() {},
-    getOff: function getOff() {}
+    inTransit: false
   }
 
 }
