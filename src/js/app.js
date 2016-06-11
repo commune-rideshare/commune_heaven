@@ -9,207 +9,273 @@
   window.jQuery = global.$ = require('jquery');
 
   var config = require("./config"),
-    ledger = require("./ledger"),
     city = require("./city"),
     utilities = require("./utilities"),
     draw = require("./draw"),
     cities = require("./cities"),
     Chance = require('chance'),
+    chance = new Chance(),
     log = require('./log'),
-    howler = require('howler'),
     PoissonProcess = require('poisson-process'),
-    chance = new Chance();
+    howler = require('howler'),
+    ping = new Howl({
+      urls: ['snd/ping.mp3']
+    }),
+    counter = 0;
+
+  // Find the right method, call on correct element
+  function launchIntoFullscreen(element) {
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    }
+  }
 
   $(function () {
 
-    var counter = 0,
-      ping = new Howl({
-        urls: ['snd/ping.mp3']
-      });
+    $('#start').click(function () {
 
-    $('#setup').addClass('hidden');
+      // Launch fullscreen
+      launchIntoFullscreen(document.documentElement);
 
-    $('#city').text(cities[3].text);
+      // Hide the start button
+      $('#start').hide();
 
-    city.init(cities[3], function () {
+      // Show the app
+      $('#app').show();
 
-      // Show drivers
-      city.drivers.forEach(function (driver) {
-        // Draw driver on map
-        draw.point(driver.id, driver.point.geometry.coordinates, config.driverColor);
-        // Add driver to table 
-        draw.driver(driver);
+      // Set the name of the city in the menu bar
+      $('#city').text(cities[3].text);
 
-      });
+      // Initialize the map...
+      city.init(cities[3], function () {
 
-      // Show riders
-      city.riders.forEach(function (rider) {
-        // Add rider to table 
-        draw.rider(rider);
-      });
-
-      // Poisson process to generate new rides
-      var sim = PoissonProcess.create(1000, function message() {
-
-        // Get a random rider and destination
-        var destination = utilities.getRandomPoint(),
-          riderIndex = 0,
-          driverIndex = 0,
-          guideRouteId = chance.guid(),
-          newShares = 0;
-
-        // Pull a random rider until one that is not in transit is found
-        riderIndex = chance.integer({
-          min: 0,
-          max: (city.riders.length - 1)
+        // Initialize drivers
+        city.drivers.forEach(function (driver) {
+          // Draw driver on map
+          draw.point(driver.id, driver.point.geometry.coordinates, config.driverColor);
+          // Add driver to table 
+          $('#drivers-table').append('<tr id="' + driver.id + '" class="' + driver.id + '"><td>' + driver.name + '</td><td class="trips">0</td><td class="shares">0</td><td class="percentage">0</td><tr>');
         });
 
-        if (city.riders[riderIndex].inTransit === true) {
-          console.log('%c IN TRANSIT', 'background: #222; color: #bada55');
-          return;
-        }
+        // Initialize riders
+        city.riders.forEach(function (rider) {
+          // Add rider to table 
+          $('#riders-table').append('<tr id="' + rider.id + '" class="' + rider.id + '"><td>' + rider.name + '</td><td class="trips">0</td><td class="shares">0</td><td class="percentage">0</td><tr>');
+        });
 
-        // Set riders state to "in transit" and "waiting"
-        city.riders[riderIndex].waiting = true;
-        city.riders[riderIndex].inTransit = true;
+        // Poisson process to generate new rides
+        var sim = PoissonProcess.create(2000, function message() {
 
-        //              console.log('rider pre-trip', city.riders[riderIndex]);
-        //              console.log('driver pre-trip', city.drivers[driverIndex]);
+          // Get a random rider and destination
+          var destination = utilities.getRandomPoint(),
+            riderIndex = 0,
+            driverIndex = 0,
+            guideRouteId = chance.guid(),
+            newShares = 0,
+            rideIndex = chance.guid();
 
-        // Add rider to map
-        draw.point(city.riders[riderIndex].id, city.riders[riderIndex].point.geometry.coordinates, config.riderColor);
+          console.log(city.waitingList.length);
 
-        // Push ride-request notification
-        log.request(city.riders[riderIndex]);
+          // Assign driver from waiting list
+          if (city.waitingList.length > 0) {
 
-        // Find closest driver
-        driverIndex = city.getClosestDriver(city.riders[riderIndex]);
+            console.log('pulled from waiting list');
 
-        // Push ride-acceptance notification
-        log.accept(city.drivers[driverIndex]);
+            riderIndex = city.waitingList.shift();
 
-        // Set drivers state to occupied
-        city.drivers[driverIndex].occupied = true;
+          } else {
 
-        //Activate closest driver
-        draw.activateDriver(city.drivers[driverIndex].id);
+            // Pull a random rider
+            riderIndex = chance.integer({
+              min: 0,
+              max: (city.riders.length - 1)
+            });
 
-        // Get directions between driver and rider
-        city.directions(city.drivers[driverIndex], city.riders[riderIndex], function (route) {
+            // If the rider is already in transit, break
+            if (city.riders[riderIndex].inTransit) {
+              return;
+            }
 
-          // Move driver to rider
-          draw.route({
-            'route': route.route,
-            'routeId': route.routeId,
-            'color': config.pickUpRouteColor,
-            'animate': true,
-            'driver': city.drivers[driverIndex]
-          }, function () {
+            // Add rider to map
+            draw.point(city.riders[riderIndex].id, city.riders[riderIndex].point.geometry.coordinates, config.riderColor);
 
-            // Push pick-up notification
-            log.pickUp(city.riders[riderIndex], city.drivers[driverIndex], route.route);
+          }
 
-            // Remove the rider-point from the map
-            draw.remove(city.riders[riderIndex].id);
+          // Push ride-request notification
+          log.request(city.riders[riderIndex]);
 
-            // Indicate driver...
-            draw.workingDriver(city.drivers[driverIndex].id);
+          // Set riders state to "in transit" and "waiting"
+          city.riders[riderIndex].inTransit = true;
 
-            // Add Rider to passangerlist
-            city.drivers[driverIndex].passengerList.push(city.riders[riderIndex].id);
+          // Find closest driver
+          driverIndex = city.getClosestDriver(city.riders[riderIndex]);
+          
+          console.log('driverindex', driverIndex);
 
-            // Draw route to destination
-            city.directions(city.riders[riderIndex], destination, function (route) {
+          /// If there are no cars available, add the request to the waiting list
+          if (driverIndex < 0) {
+            log.noDrivers();
+            city.waitingList.push(riderIndex);
+            console.log('waiting', city.waitingList);
+            draw.waitingRider(city.riders[riderIndex].id);
+            return;
+          }
 
-              // Draw guide path
-              draw.route({
-                'route': route.route,
-                'routeId': guideRouteId,
-                'color': config.emptyRouteColor,
-                'animate': false
-              }, function () {
+          // Push ride-acceptance notification
+          log.accept(city.drivers[driverIndex]);
 
-                // Move rider + driver to destination
+          // Set drivers state to occupied
+          city.drivers[driverIndex].occupied = true;
+
+          //Activate closest driver
+          draw.activateDriver(city.drivers[driverIndex].id);
+
+          // Get directions between driver and rider
+          city.directions(city.drivers[driverIndex], city.riders[riderIndex], function (route) {
+
+            // Move driver to rider
+            draw.route({
+              'route': route.route,
+              'routeId': route.routeId,
+              'color': config.pickUpRouteColor,
+              'animate': true,
+              'driver': city.drivers[driverIndex]
+            }, function () {
+
+              // Push pick-up notification
+              log.pickUp(city.riders[riderIndex], city.drivers[driverIndex], route.route);
+
+              // Remove the rider-point from the map
+              draw.remove(city.riders[riderIndex].id);
+
+              // Indicate driver...
+              draw.workingDriver(city.drivers[driverIndex].id);
+
+              // Add Rider to passangerlist
+              city.drivers[driverIndex].passengerList.push(city.riders[riderIndex].id);
+
+              // Draw route to destination
+              city.directions(city.riders[riderIndex], destination, function (route) {
+
+                // Draw guide path
                 draw.route({
                   'route': route.route,
-                  'routeId': route.routeId,
+                  'routeId': guideRouteId,
                   'color': config.emptyRouteColor,
-                  'animate': true,
-                  'driver': city.drivers[driverIndex]
+                  'animate': false
                 }, function () {
 
-                  //
-                  //
-                  // RIDE COMPLETED
-                  //
-                  //
+                  // Move rider + driver to destination
+                  draw.route({
+                    'route': route.route,
+                    'routeId': route.routeId,
+                    'color': config.emptyRouteColor,
+                    'animate': true,
+                    'driver': city.drivers[driverIndex]
+                  }, function () {
 
-                  ping.play();
+                    //
+                    //
+                    // RIDE COMPLETED
+                    //
+                    //
 
-                  // Remove the guide-route from the map
-                  draw.remove(guideRouteId);
+                    ping.play();
 
-                  // Calculate shares to issue based on on distance
-                  newShares = Math.floor(route.route.distance);
+                    // Remove the guide-route from the map
+                    draw.remove(guideRouteId);
 
-                  // Update stats
-                  ledger.totalShares += newShares;
-                  ledger.totalTrips++;
+                    // Calculate shares to issue based on on distance
+                    newShares = Math.floor(route.route.distance);
 
-                  // Update global stats view
-                  $('#total-shares').text(ledger.totalShares);
-                  $('#total-trips').text(ledger.totalTrips);
+                    // Update stats
+                    city.totalShares += 2 * newShares;
+                    city.totalTrips++;
 
-                  // Push drop-off notification
-                  log.dropOff(city.riders[riderIndex], city.drivers[driverIndex], route.route);
+                    // Update global stats view
+                    $('#total-shares').text(city.totalShares);
+                    $('#total-trips').text(city.totalTrips);
 
+                    // Push drop-off notification
+                    log.dropOff(city.riders[riderIndex], city.drivers[driverIndex], route.route);
 
-                  //
-                  // Update RIDER object and view
-                  //
+                    //
+                    // Update ride-table
+                    //
 
-                  // Add shares to riders account
-                  city.riders[riderIndex].shares += newShares;
-
-                  // Add trip to riders account
-                  city.riders[riderIndex].trips++;
-                  // Set state of rider to "not in transit"
-                  city.riders[riderIndex].inTransit = false;
-                  // Set location of rider to drop-off-point
-                  city.riders[riderIndex].point.geometry.coordinates = route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1];
-                  // Update view with rider shares
-                  $('#' + city.riders[riderIndex].id)
-                    .children('.shares')
-                    .text(city.riders[riderIndex].shares);
-                  // Update view with rider trips
-                  $('#' + city.riders[riderIndex].id)
-                    .children('.trips')
-                    .text(city.riders[riderIndex].trips);
+                    var newRide = {
+                      id: rideIndex,
+                      distance: route.route.distance,
+                      shares: (newShares * 2)
+                    };
+                    city.rides.push(newRide);
+                    $('.ride-table-body').prepend('<tr id="' + newRide.id + '" class="' + newRide.id + '"><td>' + newRide.id + '</td><td class="distance">' + newRide.distance + '</td><td class="shares">' + newRide.shares + '</td>><tr>');
 
 
-                  //
-                  // Update DRIVER object and view
-                  //
+                    //
+                    // Update RIDER object and view
+                    //
 
-                  // Add trip to drivers account
-                  city.drivers[driverIndex].trips++;
-                  // Add shares to drivers account
-                  city.drivers[driverIndex].shares += newShares;
-                  // Set state of driver to "not occupied" 
-                  city.drivers[driverIndex].occupied = false;
-                  // Set location of driver to drop-off-point
-                  city.drivers[driverIndex].point.geometry.coordinates = route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1];
-                  //DE-activate driver
-                  draw.deActivateDriver(city.drivers[driverIndex].id);
-                  // Update view with driver shares
-                  $('#' + city.drivers[driverIndex].id)
-                    .children('.shares')
-                    .text(city.drivers[driverIndex].shares);
-                  // Update view with driver trips
-                  $('#' + city.drivers[driverIndex].id)
-                    .children('.trips')
-                    .text(city.drivers[driverIndex].trips);
+                    // Add shares to riders account
+                    city.riders[riderIndex].shares += newShares;
+                    // Update ownership percentage of riders account (round to 2 decimals)
+                    city.riders[riderIndex].percentage = (city.riders[riderIndex].shares / city.totalShares) * 100;
+                    // Add trip to riders account
+                    city.riders[riderIndex].trips++;
+                    // Set state of rider to "not in transit"
+                    city.riders[riderIndex].inTransit = false;
+                    // Set location of rider to drop-off-point
+                    city.riders[riderIndex].point.geometry.coordinates = route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1];
+                    // Update view with rider shares
+                    $('#' + city.riders[riderIndex].id)
+                      .children('.shares')
+                      .text(city.riders[riderIndex].shares);
+                    // Update view with rider ownership percentage
+                    $('#' + city.riders[riderIndex].id)
+                      .children('.percentage')
+                      .text(Math.floor(city.riders[riderIndex].percentage));
+                    // Update view with rider trips
+                    $('#' + city.riders[riderIndex].id)
+                      .children('.trips')
+                      .text(city.riders[riderIndex].trips);
 
+
+                    //
+                    // Update DRIVER object and view
+                    //
+
+                    // Add trip to drivers account
+                    city.drivers[driverIndex].trips++;
+                    // Add shares to drivers account
+                    city.drivers[driverIndex].shares += newShares;
+                    // Update ownership percentage of drivers account (round to 2 decimals)
+                    city.drivers[driverIndex].percentage = (city.drivers[driverIndex].shares / city.totalShares) * 100;
+                    // Set state of driver to "not occupied" 
+                    city.drivers[driverIndex].occupied = false;
+                    // Set location of driver to drop-off-point
+                    city.drivers[driverIndex].point.geometry.coordinates = route.route.geometry.coordinates[route.route.geometry.coordinates.length - 1];
+                    //DE-activate driver
+                    draw.deActivateDriver(city.drivers[driverIndex].id);
+                    // Update view with driver shares
+                    $('#' + city.drivers[driverIndex].id)
+                      .children('.shares')
+                      .text(city.drivers[driverIndex].shares);
+                    // Update view with driver ownership percentage
+                    $('#' + city.drivers[driverIndex].id)
+                      .children('.percentage')
+                      .text(Math.floor(city.drivers[driverIndex].percentage));
+                    // Update view with driver trips
+                    $('#' + city.drivers[driverIndex].id)
+                      .children('.trips')
+                      .text(city.drivers[driverIndex].trips);
+
+                  });
 
                 });
 
@@ -221,9 +287,9 @@
 
         });
 
-      });
+        sim.start();
 
-      sim.start();
+      });
 
     });
 

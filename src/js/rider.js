@@ -22,6 +22,7 @@ function rider(startPosition, id, name) {
     name: name,
     shares: 0,
     trips: 0,
+    percentage: 0,
     waiting: false,
     inTransit: false
   }

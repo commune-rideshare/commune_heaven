@@ -4,7 +4,7 @@
 // Require jQuery
 global.$ = require("jquery");
 
-var ledger = require("./ledger"),
+var config = require("./config"),
   mapboxgl = require('mapbox-gl'),
   moment = require('moment'),
   city = require("./city");
@@ -33,9 +33,9 @@ var draw = {
       "source": id,
       "type": "circle",
       "paint": {
-        "circle-radius": 15,
+        "circle-radius": config.normalSize,
         "circle-color": color,
-        "circle-blur": 0.5
+        "circle-blur": 0.1
       }
     });
 
@@ -44,16 +44,6 @@ var draw = {
 
     city.map.removeLayer(id);
     city.map.removeSource(id);
-
-  },
-  driver: function driver(driver) {
-
-    $('#drivers-table').append('<tr id="' + driver.id + '" class="' + driver.id + '"><td>' + driver.name + '</td><td class="trips">0</td><td class="shares">0</td><tr>');
-
-  },
-  rider: function rider(rider) {
-
-    $('#riders-table').append('<tr id="' + rider.id + '" class="' + rider.id + '"><td>' + rider.name + '</td><td class="trips">0</td><td class="shares">0</td><tr>');
 
   },
   route: function route(data, cb) {
@@ -89,8 +79,6 @@ var draw = {
       // Draw route without animation
     } else {
 
-      //      console.log('coords', data.route.geometry.coordinates);
-
       city.map.addSource(data.routeId, {
         "type": "geojson",
         "data": {
@@ -107,14 +95,12 @@ var draw = {
         "id": data.routeId,
         "type": "line",
         "source": data.routeId,
-        "layout": {
-          "line-join": "round",
-          "line-cap": "round"
-        },
+        "layout": {},
         "paint": {
-          "line-color": '#f00',
-          "line-width": 4,
-          "line-opacity": 0.5
+          "line-color": '#fff',
+          "line-width": 2,
+          "line-opacity": 0.4,
+          "line-dasharray": [2, 1]
         }
       });
 
@@ -124,14 +110,17 @@ var draw = {
 
   },
   activateDriver: function activateDriver(driverId) {
-    city.map.setPaintProperty(driverId, "circle-radius", 25);
+    city.map.setPaintProperty(driverId, "circle-radius", config.activeSize);
   },
   workingDriver: function workingDriver(driverId) {
-    city.map.setPaintProperty(driverId, "circle-color", '#f00');
+    city.map.setPaintProperty(driverId, "circle-color", config.workColor);
   },
   deActivateDriver: function deActivateDriver(driverId) {
-    city.map.setPaintProperty(driverId, "circle-radius", 15);
-    city.map.setPaintProperty(driverId, "circle-color", '#fff');
+    city.map.setPaintProperty(driverId, "circle-radius", config.normalSize);
+    city.map.setPaintProperty(driverId, "circle-color", config.activeColor);
+  },
+  waitingRider: function waitingRider(riderId) {
+    city.map.setPaintProperty(riderId, "circle-color", '#f90056');
   }
 }
 

@@ -12,11 +12,15 @@ var config = require("./config"),
   geohash = require('ngeohash');
 
 var city = {
+  totalShares: 0,
+  totalTrips: 0,
   map: {},
   bounds: {},
   routes: [],
   drivers: [],
   riders: [],
+  rides: [],
+  waitingList: [],
   mapboxClient: {},
   spawnDrivers: function spawnDrivers(numberOfDrivers) {
 
@@ -105,14 +109,13 @@ var city = {
     this.bounds = this.map.getBounds();
 
     // Set limit to outward zoom
-    sw = new mapboxgl.LngLat(this.bounds._sw.lng + 0.08, this.bounds._sw.lat + 0.08);
-    ne = new mapboxgl.LngLat(this.bounds._ne.lng - 0.08, this.bounds._ne.lat - 0.08);
+    sw = new mapboxgl.LngLat(this.bounds._sw.lng + 0.04, this.bounds._sw.lat + 0.04);
+    ne = new mapboxgl.LngLat(this.bounds._ne.lng - 0.04, this.bounds._ne.lat - 0.04);
     zoomBounds = new mapboxgl.LngLatBounds(sw, ne);
-
-    //    this.map.setMaxBounds(this.bounds);
+    this.map.setMaxBounds(zoomBounds);
 
     // Create drivers
-    this.spawnDrivers(10);
+    this.spawnDrivers(7);
 
     // Create riders
     this.spawnRiders(30);
@@ -129,6 +132,8 @@ var city = {
         "features": []
       },
       nearestDriver = {};
+
+    console.log(this.drivers);
 
     // Make a collection of all drivers that are not currently occupied
     this.drivers.forEach(function (driver) {
@@ -147,7 +152,7 @@ var city = {
         }
       }
     } else {
-      return('-1');
+      return -1;
     }
 
   },
