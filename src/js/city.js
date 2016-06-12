@@ -109,16 +109,27 @@ var city = {
     this.bounds = this.map.getBounds();
 
     // Set limit to outward zoom
-    sw = new mapboxgl.LngLat(this.bounds._sw.lng + 0.04, this.bounds._sw.lat + 0.04);
-    ne = new mapboxgl.LngLat(this.bounds._ne.lng - 0.04, this.bounds._ne.lat - 0.04);
-    zoomBounds = new mapboxgl.LngLatBounds(sw, ne);
-    this.map.setMaxBounds(zoomBounds);
+    //    sw = new mapboxgl.LngLat(this.bounds._sw.lng + 0.04, this.bounds._sw.lat + 0.04);
+    //    ne = new mapboxgl.LngLat(this.bounds._ne.lng - 0.04, this.bounds._ne.lat - 0.04);
+    //    zoomBounds = new mapboxgl.LngLatBounds(sw, ne);
+    //    this.map.setMaxBounds(zoomBounds);
 
     // Create drivers
     this.spawnDrivers(7);
 
     // Create riders
     this.spawnRiders(30);
+
+    //    this.map.flyTo({
+    //      center: city.center,
+    //      zoom: city.zoom - 2,
+    //      bearing: 0,
+    //      speed: 0.1,
+    //      curve: 1,
+    //      easing: function (t) {
+    //        return t;
+    //      }
+    //    });
 
     this.map.on('load', function () {
       cb();
@@ -132,8 +143,6 @@ var city = {
         "features": []
       },
       nearestDriver = {};
-
-    console.log(this.drivers);
 
     // Make a collection of all drivers that are not currently occupied
     this.drivers.forEach(function (driver) {

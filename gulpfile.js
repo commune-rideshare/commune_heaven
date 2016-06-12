@@ -1,21 +1,20 @@
 // Include gulp
-const gulp            = require('gulp'),
-      uglify          = require('gulp-uglify'),
-      autoprefixer    = require('gulp-autoprefixer'),
-      plumber         = require('gulp-plumber'),
-      cssnano         = require('gulp-cssnano'),
-      sass            = require('gulp-sass'),
-      notify          = require('gulp-notify'),
-      imagemin        = require('gulp-imagemin'),
-      pngquant        = require('imagemin-pngquant'),
-      changed         = require('gulp-changed'),
-      parker          = require('gulp-parker'),
-      fontgen         = require('gulp-fontgen'),
-      browserify      = require('browserify'),
-      source          = require('vinyl-source-stream'),
-      buffer          = require('vinyl-buffer'),
-      hbsfy           = require("hbsfy").configure({extensions: ["html"]}),
-      browserSync     = require('browser-sync').create();
+const gulp = require('gulp'),
+  uglify = require('gulp-uglify'),
+  autoprefixer = require('gulp-autoprefixer'),
+  plumber = require('gulp-plumber'),
+  cssnano = require('gulp-cssnano'),
+  sass = require('gulp-sass'),
+  notify = require('gulp-notify'),
+  imagemin = require('gulp-imagemin'),
+  pngquant = require('imagemin-pngquant'),
+  changed = require('gulp-changed'),
+  parker = require('gulp-parker'),
+  fontgen = require('gulp-fontgen'),
+  browserify = require('browserify'),
+  source = require('vinyl-source-stream'),
+  buffer = require('vinyl-buffer'),
+  browserSync = require('browser-sync').create();
 
 // Build javascript
 gulp.task('scripts', function () {
@@ -26,7 +25,7 @@ gulp.task('scripts', function () {
     .bundle()
     .pipe(source('app.min.js'))
     .pipe(buffer())
-    //    .pipe(uglify())
+    .pipe(uglify())
     .pipe(gulp.dest('./'))
     .pipe(browserSync.stream());
 

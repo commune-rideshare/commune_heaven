@@ -21,7 +21,8 @@
     ping = new Howl({
       urls: ['snd/ping.mp3']
     }),
-    counter = 0;
+    counter = 0,
+    simulationSpeed = 4000;
 
   // Find the right method, call on correct element
   function launchIntoFullscreen(element) {
@@ -34,6 +35,51 @@
     } else if (element.msRequestFullscreen) {
       element.msRequestFullscreen();
     }
+  }
+
+  function calculateOwnershipPercentage() {
+
+    var driverShares = 0,
+      riderShares = 0;
+
+    // Update and refresh ownership percentage for DRIVERS
+    for (var i = 0; i < city.drivers.length; i++) {
+      city.drivers[i].percentage = (city.drivers[i].shares / city.totalShares) * 100;
+
+      $('#' + city.drivers[i].id)
+        .children('.percentage')
+        .text(Math.floor(city.drivers[i].percentage));
+
+      driverShares += city.drivers[i].shares;
+
+    }
+
+    // Update and refresh ownership percentage for RIDERS
+    for (var i = 0; i < city.riders.length; i++) {
+      city.riders[i].percentage = (city.riders[i].shares / city.totalShares) * 100;
+
+      $('#' + city.riders[i].id)
+        .children('.percentage')
+        .text(Math.floor(city.riders[i].percentage));
+
+      riderShares += city.riders[i].shares;
+
+    }
+
+    console.log('drivershares', driverShares);
+    console.log('ridershares', riderShares);
+    console.log('totalshares', city.totalShares);
+
+    var driverOwnership = Math.floor((driverShares / city.totalShares) * 100),
+      riderOwnership = Math.floor((riderShares / city.totalShares) * 100);
+
+    $('#rider-ownership')
+      .text(riderOwnership + '%');
+
+    $('#driver-ownership')
+      .text(driverOwnership + '%');
+
+    $('#own-inner').css('width', driverOwnership + '%');
   }
 
   $(function () {
@@ -70,7 +116,7 @@
         });
 
         // Poisson process to generate new rides
-        var sim = PoissonProcess.create(2000, function message() {
+        var sim = PoissonProcess.create(simulationSpeed, function message() {
 
           // Get a random rider and destination
           var destination = utilities.getRandomPoint(),
@@ -80,14 +126,14 @@
             newShares = 0,
             rideIndex = chance.guid();
 
-          console.log(city.waitingList.length);
-
           // Assign driver from waiting list
           if (city.waitingList.length > 0) {
 
             console.log('pulled from waiting list');
 
             riderIndex = city.waitingList.shift();
+
+            draw.resetRider(city.riders[riderIndex].id);
 
           } else {
 
@@ -115,14 +161,11 @@
 
           // Find closest driver
           driverIndex = city.getClosestDriver(city.riders[riderIndex]);
-          
-          console.log('driverindex', driverIndex);
 
           /// If there are no cars available, add the request to the waiting list
           if (driverIndex < 0) {
             log.noDrivers();
             city.waitingList.push(riderIndex);
-            console.log('waiting', city.waitingList);
             draw.waitingRider(city.riders[riderIndex].id);
             return;
           }
@@ -224,8 +267,6 @@
 
                     // Add shares to riders account
                     city.riders[riderIndex].shares += newShares;
-                    // Update ownership percentage of riders account (round to 2 decimals)
-                    city.riders[riderIndex].percentage = (city.riders[riderIndex].shares / city.totalShares) * 100;
                     // Add trip to riders account
                     city.riders[riderIndex].trips++;
                     // Set state of rider to "not in transit"
@@ -236,10 +277,6 @@
                     $('#' + city.riders[riderIndex].id)
                       .children('.shares')
                       .text(city.riders[riderIndex].shares);
-                    // Update view with rider ownership percentage
-                    $('#' + city.riders[riderIndex].id)
-                      .children('.percentage')
-                      .text(Math.floor(city.riders[riderIndex].percentage));
                     // Update view with rider trips
                     $('#' + city.riders[riderIndex].id)
                       .children('.trips')
@@ -254,8 +291,6 @@
                     city.drivers[driverIndex].trips++;
                     // Add shares to drivers account
                     city.drivers[driverIndex].shares += newShares;
-                    // Update ownership percentage of drivers account (round to 2 decimals)
-                    city.drivers[driverIndex].percentage = (city.drivers[driverIndex].shares / city.totalShares) * 100;
                     // Set state of driver to "not occupied" 
                     city.drivers[driverIndex].occupied = false;
                     // Set location of driver to drop-off-point
@@ -267,13 +302,13 @@
                       .children('.shares')
                       .text(city.drivers[driverIndex].shares);
                     // Update view with driver ownership percentage
-                    $('#' + city.drivers[driverIndex].id)
-                      .children('.percentage')
-                      .text(Math.floor(city.drivers[driverIndex].percentage));
                     // Update view with driver trips
                     $('#' + city.drivers[driverIndex].id)
                       .children('.trips')
                       .text(city.drivers[driverIndex].trips);
+
+                    //Update ownership percentage
+                    calculateOwnershipPercentage();
 
                   });
 

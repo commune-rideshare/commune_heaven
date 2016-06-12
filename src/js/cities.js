@@ -21,7 +21,7 @@ var cities = [
     text: 'Amsterdam',
     value: 'amsterdam',
     center: [4.8574038, 52.3561256],
-    zoom: 15
+    zoom: 14
   }
 ];
 

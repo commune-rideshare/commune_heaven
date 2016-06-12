@@ -3,10 +3,6 @@
     background: $main-color;
     color: $background-color;
   }
-  //  &:fullscreen {
-  //    height: 100vh;
-  //    width: 100vw;
-  //  }
 }
 
 body {
@@ -15,7 +11,7 @@ body {
   font-size: $font-size;
   line-height: $line-height;
   overflow: hidden;
-  font-family: 'Work Sans', sans-serif;
+  font-family: "SanFranciscoDisplay-Light", sans-serif;
   @include screen-size('small') {}
 }
 
@@ -53,6 +49,10 @@ a {
   display: none;
 }
 
+strong {
+  font-family: "SanFranciscoDisplay-Medium", sans-serif;
+}
+
 .container {
   margin-top: 10%;
 }
@@ -62,8 +62,8 @@ a {
   z-index: 10;
   width: $panel-width;
   right: 0;
-  height: 200px;
-  max-height: 25vh;
+  height: 150px;
+  //  max-height: 25vh;
   padding: 5px;
   top: 30px;
   width: calc(100% / 3);
@@ -83,14 +83,14 @@ a {
 }
 
 .riders {
-  left: calc(100% / 3);
+  left: calc(100% / 1.5);
   background: $passenger-color;
   color: black !important;
 }
 
 .rides {
-  left: calc(100% / 1.5);
-  background: $joint-color;
+  left: calc(100% / 3);
+  background: $ride-color;
   color: black !important;
 }
 
@@ -181,16 +181,25 @@ a {
   }
 }
 
+.corner-logo {
+  position: fixed;
+  bottom: 10px;
+  left: 20px;
+}
+
+.bottom {
+  fill: $passenger-color !important;
+}
+
 tbody {
-  border: 0;
+  border-top: 0 !important;
 }
 
 .log {
   position: fixed;
   bottom: 10px;
   right: 20px;
-  width: 200px;
-//  height: 200px;
+  width: 300px;
   z-index: 10000;
   pointer-events: none;
   display: table;
@@ -200,27 +209,66 @@ tbody {
     width: 100%;
     padding: 10px;
     margin: 10px;
-//    max-height: 200px;
+    font-size: 14px;
     border-radius: 5px;
     display: none;
     vertical-align: bottom;
     &:nth-child(-n+1) {
       display: table-cell;
     }
-    //    &.request {
-    //      background: green;
-    //    }
-    //    &.raccept {
-    //      background: blue;
-    //    }
-    //    &.drop-off {
-    //      background: yellow;
-    //    }
-    //    &.pick-upp {
-    //      background: azure;
-    //    }
-    //    &.no-drivers {
-    //      background: red;
-    //    }
+    &.request {
+      background: $passenger-color;
+    }
+    &.accept {
+      background: $driver-color;
+    }
+    &.drop-off {
+      background: $ride-color;
+    }
+    &.pick-up {
+      background: $ride-color;
+    }
+    &.no-drivers {
+      background: red;
+      color: white;
+    }
   }
+}
+
+.ownership {
+  position: fixed;
+  top: 180px;
+  left: 0;
+  width: 100%;
+  height: 32px;
+  line-height: 32px;
+  background: black;
+  z-index: 1000;
+  display: block;
+  text-align: center;
+  .own-drivers {
+    height: 20px;
+    width: 33%;
+    float: left;
+    height: 100%;
+  }
+  .own-bar {
+    height: 12px;
+    width: 100%;
+    float: left;
+    background: $passenger-color;
+    ;
+  }
+  .own-riders {
+    height: 20px;
+    width: 33%;
+    float: right;
+    height: 100%;
+  }
+}
+
+#own-inner {
+  height: 100%;
+  width: 50%;
+  background: $driver-color;
 }

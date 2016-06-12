@@ -5,9 +5,10 @@
 global.$ = require("jquery");
 
 var config = require("./config"),
-  mapboxgl = require('mapbox-gl'),
-  moment = require('moment'),
-  city = require("./city");
+    mapboxgl = require('mapbox-gl'),
+    moment = require('moment'),
+    city = require("./city"),
+    speed = 200;
 
 require("moment-duration-format");
 
@@ -35,7 +36,7 @@ var draw = {
       "paint": {
         "circle-radius": config.normalSize,
         "circle-color": color,
-        "circle-blur": 0.1
+        "circle-blur": 0.5
       }
     });
 
@@ -54,8 +55,7 @@ var draw = {
       },
       i = 0,
       steps = data.route.geometry.coordinates.length,
-      animation = {},
-      speed = 100;
+      animation = {};
 
     // Animate route
     if (data.animate == true) {
@@ -97,9 +97,9 @@ var draw = {
         "source": data.routeId,
         "layout": {},
         "paint": {
-          "line-color": '#fff',
+          "line-color": config.workColor,
           "line-width": 2,
-          "line-opacity": 0.4,
+          //          "line-opacity": ,
           "line-dasharray": [2, 1]
         }
       });
@@ -120,8 +120,11 @@ var draw = {
     city.map.setPaintProperty(driverId, "circle-color", config.activeColor);
   },
   waitingRider: function waitingRider(riderId) {
-    city.map.setPaintProperty(riderId, "circle-color", '#f90056');
-  }
+    city.map.setPaintProperty(riderId, "circle-color", config.waitColor);
+  },
+  resetRider: function resetRider(riderId) {
+    city.map.setPaintProperty(riderId, "circle-color", config.riderColor);
+  },
 }
 
 module.exports = draw;
