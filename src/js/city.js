@@ -2,14 +2,15 @@
 /*global $, jQuery*/
 
 var config = require("./config"),
-  driver = require("./driver"),
-  rider = require("./rider"),
-  mapboxgl = require('mapbox-gl'),
-  MapboxClient = require('mapbox'),
-  turf = require('turf'),
-  Chance = require('chance'),
-  chance = new Chance(),
-  geohash = require('ngeohash');
+    driver = require("./driver"),
+    rider = require("./rider"),
+    mapboxgl = require('mapbox-gl'),
+    MapboxClient = require('mapbox'),
+    turf = require('turf'),
+    names = require('./names'),
+    Chance = require('chance'),
+    chance = new Chance(),
+    geohash = require('ngeohash');
 
 var city = {
   totalShares: 0,
@@ -47,7 +48,7 @@ var city = {
           parent.drivers.push(driver(
             [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
             chance.guid(),
-            chance.name()));
+            names.getRandomName()));
 
         });
 
@@ -79,7 +80,7 @@ var city = {
           parent.riders.push(rider(
             [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
             chance.guid(),
-            chance.name()));
+            names.getRandomName()));
 
         });
 

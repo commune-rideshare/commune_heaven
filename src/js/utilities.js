@@ -2,12 +2,14 @@
 /*global $, jQuery*/
 
 var city = require("./city"),
-  Chance = require('chance'),
-  chance = new Chance();
+    Chance = require('chance'),
+    chance = new Chance();
 
 var utilities = {
   getRandomPoint: function getRandomPoint() {
 
+    console.log(city);
+    
     var location = {
       point: {
         "type": "Feature",

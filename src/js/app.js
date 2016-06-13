@@ -9,20 +9,20 @@
   window.jQuery = global.$ = require('jquery');
 
   var config = require("./config"),
-    city = require("./city"),
-    utilities = require("./utilities"),
-    draw = require("./draw"),
-    cities = require("./cities"),
-    Chance = require('chance'),
-    chance = new Chance(),
-    log = require('./log'),
-    PoissonProcess = require('poisson-process'),
-    howler = require('howler'),
-    ping = new Howl({
-      urls: ['snd/ping.mp3']
-    }),
-    counter = 0,
-    simulationSpeed = 4000;
+      city = require("./city"),
+      utilities = require("./utilities"),
+      draw = require("./draw"),
+      cities = require("./cities"),
+      Chance = require('chance'),
+      chance = new Chance(),
+      log = require('./log'),
+      PoissonProcess = require('poisson-process'),
+      howler = require('howler'),
+      ping = new Howl({
+        urls: ['snd/ping.mp3']
+      }),
+      counter = 0,
+      simulationSpeed = 4000;
 
   // Find the right method, call on correct element
   function launchIntoFullscreen(element) {
@@ -87,7 +87,7 @@
     $('#start').click(function () {
 
       // Launch fullscreen
-      launchIntoFullscreen(document.documentElement);
+//      launchIntoFullscreen(document.documentElement);
 
       // Hide the start button
       $('#start').hide();
