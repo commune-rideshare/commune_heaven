@@ -64,12 +64,18 @@ strong {
   right: 0;
   height: 150px;
   //  max-height: 25vh;
-  padding: 5px;
-  top: 30px;
+  top: 50px;
   width: calc(100% / 3);
   overflow-x: hidden;
   overflow-y: scroll;
-  opacity: 0.9;
+  opacity: 0.95;
+  border: none !important;
+  div {
+    font-size: 16px;
+    border: none !important;
+    text-decoration: none;
+    margin-bottom: 10px;
+  }
   @include hide-scroll;
   &.active {
     height: 100%;
@@ -77,38 +83,53 @@ strong {
 }
 
 .drivers {
+  // display: none !important;
+  padding: 15px;
+
   left: 0;
   background: $driver-color;
   color: black !important;
 }
 
 .riders {
+  padding: 15px;
+
+  // display: none;
   left: calc(100% / 1.5);
   background: $passenger-color;
   color: black !important;
 }
 
 .rides {
+  padding: 15px;
+
+  // display: none;
   left: calc(100% / 3);
   background: $ride-color;
   color: black !important;
 }
 
 .stats {
+  // display: none !important;
   position: fixed;
   top: 0;
   left: 0;
-  height: 30px;
+  height: 50px;
   width: 100%;
-  background: black;
+  background: #fff;
+  color: $black;
   display: block;
   opacity: 1;
+  font-size: 24px;
+  font-weight: 100;
   div {
     text-align: center;
     display: inline;
     width: calc(100% / 3);
     float: left;
-    line-height: 30px;
+    line-height: 50px;
+    color: $black;
+    font-size: 24px;
   }
 }
 
@@ -130,7 +151,7 @@ strong {
 
 .panel {
   margin: 10px;
-  background: grey;
+  background: #e4e4e4;;
   padding: 10px;
   transition: all 0.5s ease;
   border-radius: 2px;
@@ -223,19 +244,20 @@ tbody {
       background: $driver-color;
     }
     &.drop-off {
-      background: $ride-color;
+      background: $passenger-color;
     }
     &.pick-up {
-      background: $ride-color;
+      background: $driver-color;
     }
     &.no-drivers {
-      background: red;
+      background: black;
       color: white;
     }
   }
 }
 
 .ownership {
+  display: none !important;
   position: fixed;
   top: 180px;
   left: 0;
@@ -271,4 +293,29 @@ tbody {
   height: 100%;
   width: 50%;
   background: $driver-color;
+}
+
+tr {
+  border: 0px solid transparent !important;
+}
+
+td {
+  border: 0px solid transparent !important;
+}
+
+td, th {
+  padding-left: 0 !important;
+}
+
+table {
+  padding-left: 10px !important;
+  border: 0px solid transparent !important;
+}
+
+th {
+  border-bottom: 1px solid #d4d4d4;
+}
+
+.greyed {
+  color: #a4a4a4;
 }

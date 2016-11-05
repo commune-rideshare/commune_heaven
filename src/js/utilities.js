@@ -7,9 +7,7 @@ var city = require("./city"),
 
 var utilities = {
   getRandomPoint: function getRandomPoint() {
-
-    console.log(city);
-    
+        
     var location = {
       point: {
         "type": "Feature",

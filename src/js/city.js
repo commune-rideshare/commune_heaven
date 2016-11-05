@@ -101,7 +101,7 @@ var city = {
     // Create the map
     this.map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/dark-v8',
+      style: config.styleURL,
       center: city.center,
       zoom: city.zoom
     });
@@ -116,7 +116,7 @@ var city = {
     //    this.map.setMaxBounds(zoomBounds);
 
     // Create drivers
-    this.spawnDrivers(7);
+    this.spawnDrivers(12);
 
     // Create riders
     this.spawnRiders(30);

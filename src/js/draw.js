@@ -8,7 +8,7 @@ var config = require("./config"),
     mapboxgl = require('mapbox-gl'),
     moment = require('moment'),
     city = require("./city"),
-    speed = 200;
+    speed = 100;
 
 require("moment-duration-format");
 
@@ -35,8 +35,7 @@ var draw = {
       "type": "circle",
       "paint": {
         "circle-radius": config.normalSize,
-        "circle-color": color,
-        "circle-blur": 0.5
+        "circle-color": color
       }
     });
 
@@ -49,7 +48,13 @@ var draw = {
   },
   route: function route(data, cb) {
 
+    // console.log('route data', data);
+
     var newPosition = {
+        "type": "Point",
+        "coordinates": []
+      },
+      offsetPosition = {
         "type": "Point",
         "coordinates": []
       },
@@ -64,11 +69,26 @@ var draw = {
 
         newPosition.coordinates = data.route.geometry.coordinates[i];
 
+        // Animate Driver
         city.map.getSource(data.driver.id).setData(newPosition);
+
+        // console.log('NEWPOSITION', newPosition.coordinates);
+
+        // Animate Rider
+        if(data.rider && newPosition.coordinates !== undefined) {
+          offsetPosition.coordinates[0] = newPosition.coordinates[0];
+          offsetPosition.coordinates[1] = newPosition.coordinates[1] + 0.00015;
+          // console.log('new 0', newPosition.coordinates[0]);
+          console.log('new 1', newPosition.coordinates[1]);
+          // console.log('off 0', offsetPosition.coordinates[0]);
+          console.log('off 1', offsetPosition.coordinates[1]);
+          city.map.getSource(data.rider.id).setData(offsetPosition);
+        }
 
         i++;
 
         if (i > steps) {
+          console.log('trip drawn');
           clearInterval(animation);
           setTimeout(function () {
             cb();
@@ -124,6 +144,12 @@ var draw = {
   },
   resetRider: function resetRider(riderId) {
     city.map.setPaintProperty(riderId, "circle-color", config.riderColor);
+  },
+  activateRider: function activateRider(riderId) {
+    city.map.setPaintProperty(riderId, "circle-opacity", 1);
+  },
+  deActivateRider: function deActivateRider(riderId) {
+    city.map.setPaintProperty(riderId, "circle-opacity", 0);
   },
 }
 
