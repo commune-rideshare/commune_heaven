@@ -12,6 +12,7 @@ body {
   line-height: $line-height;
   overflow: hidden;
   font-family: "SanFranciscoDisplay-Light", sans-serif;
+  font-weight: 100;
   @include screen-size('small') {}
 }
 
@@ -58,18 +59,18 @@ strong {
 }
 
 .info-box {
-  position: fixed;
+  position: static;
   z-index: 10;
-  width: $panel-width;
-  right: 0;
-  height: 150px;
-  //  max-height: 25vh;
-  top: 50px;
+  float: left;
   width: calc(100% / 3);
   overflow-x: hidden;
   overflow-y: scroll;
   opacity: 0.95;
   border: none !important;
+  padding: 15px;
+  padding-top: 0;
+  color: $black;
+  background: rgba(255,255,255,0.8) !important;
   div {
     font-size: 16px;
     border: none !important;
@@ -79,73 +80,6 @@ strong {
   @include hide-scroll;
   &.active {
     height: 100%;
-  }
-}
-
-.drivers {
-  // display: none !important;
-  padding: 15px;
-
-  left: 0;
-  background: $driver-color;
-  color: black !important;
-}
-
-.riders {
-  padding: 15px;
-
-  // display: none;
-  left: calc(100% / 1.5);
-  background: $passenger-color;
-  color: black !important;
-}
-
-.rides {
-  padding: 15px;
-
-  // display: none;
-  left: calc(100% / 3);
-  background: $ride-color;
-  color: black !important;
-}
-
-.stats {
-  // display: none !important;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 50px;
-  width: 100%;
-  background: #fff;
-  color: $black;
-  display: block;
-  opacity: 1;
-  font-size: 24px;
-  font-weight: 100;
-  div {
-    text-align: center;
-    display: inline;
-    width: calc(100% / 3);
-    float: left;
-    line-height: 50px;
-    color: $black;
-    font-size: 24px;
-  }
-}
-
-.bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  height: 30px;
-  width: 100%;
-  background: white;
-  display: block;
-  opacity: 1;
-  display: none;
-  span {
-    margin-right: 100px;
-    float: left;
   }
 }
 
@@ -177,7 +111,7 @@ strong {
 }
 
 #app {
-  display: none;
+  // display: none;
 }
 
 #start {
@@ -318,4 +252,268 @@ th {
 
 .greyed {
   color: #a4a4a4;
+}
+
+.map-marker {
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 40px;
+  color: white;
+  // background: red;
+  // transition: all 5s ease;
+}
+
+.driver-marker {
+  background: $driver-color;
+  &.en-route {
+    // background: red;
+    width: 35px;
+    height: 35px;
+  }
+}
+
+.passenger-marker {
+  background: $passenger-color;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  &.active {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+  }
+}
+
+header {
+  position: fixed;
+  z-index: 10000;
+  background: $background-color;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  color: $black;
+  font-size: 36px;
+  line-height: 50px;
+  padding-left: 20px;
+}
+
+footer {
+  position: fixed;
+  z-index: 10000;
+  background: $background-color;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+}
+
+.groups {
+  position: fixed;
+  z-index: 10000;
+  bottom: 70px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+}
+
+.marquee {
+  background: $driver-color;
+  height: 100%;
+  width: 100%;
+  float: left;
+  line-height: 70px;
+}
+
+.time {
+  float: left;
+  width: 20%;
+  line-height: 70px;
+}
+
+.stats {
+  position: fixed;
+  z-index: 10000;
+  background: #4a90e2;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  color: $black;
+  font-size: 30px;
+  line-height: 50px;
+  padding-left: 20px;
+}
+
+.stats-header {
+  padding-right: 30%;
+  position: fixed;
+  z-index: 10000;
+  background: white;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  padding-left: 20px;
+  color: $black;
+  font-size: 14px;
+  line-height: 30px;
+  div {
+    // padding-left: 10px;
+    // border-right: 1px solid $black;
+    display: inline-block;
+    // text-align: center;
+  }
+  .group {
+    width: 40%;
+    margin-right: 30px;
+    // background: red;
+  }
+  .shares {
+    width: 35%;
+    // border-right: 1px solid $black;
+    // background: green;
+  }
+  .distribution {
+    width: 19%;
+  }
+}
+
+.stats-left {
+  width: 70%;
+  float: left;
+}
+
+.stats-right {
+  width: 30%;
+  float: left;
+  height: 170px;
+}
+
+#graph {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 170px;
+  margin-top: 15px;
+  position: relative;
+  canvas {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+  }
+}
+
+.interest-group {
+  height: 65px;
+  line-height: 60px;
+  color: $background-color;
+  border-bottom: 1px solid white;
+  &:last-child {
+    border-bottom: 0px solid white;
+  }
+  span {
+    display: inline-block;
+  }
+  margin-right: 30px;
+}
+
+.group-name {
+  width: 30%;
+}
+
+.shares {
+  width: 40%;
+  height: 10%;
+  text-align: center;
+}
+
+.percentage {
+  width: 10%;
+  height: 5%;
+}
+
+.indicator {
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  color: #4a90e2;
+  font-size: 14px;
+  position: relative;
+  top: -5px;
+  margin-top:10px;
+  margin-right:20px;
+  margin-left:20px;
+  &.passengers {
+    background: $passenger-color;
+  }
+  &.drivers {
+    background: $driver-color;
+  }
+  &.investors {
+    background: $grey;
+  }
+}
+
+#ownershipChart {
+  max-height: 100%;
+
+}
+
+.group-header {
+ height: 40px;
+ line-height: 40px;
+ span {
+   float: right;
+   margin-right: 20px;
+ }
+}
+
+.log {
+  position: fixed;
+  bottom: 120px;
+  right: 10px;
+  width: 300px;
+  z-index: 10000;
+  pointer-events: none;
+  display: table;
+  z-index: 1000;
+  div {
+    background: white;
+    color: black;
+    width: 100%;
+    padding: 10px;
+    margin: 10px;
+    font-size: 18px;
+    line-height: 20px;
+    border-radius: 5px;
+    display: none;
+    vertical-align: bottom;
+    &:nth-child(-n+1) {
+      display: table-cell;
+    }
+    &.request {
+      background: rgba($passenger-color, 0.8);
+    }
+    &.accept {
+      background: rgba($driver-color, 0.8);
+    }
+    &.drop-off {
+      background: rgba($passenger-color, 0.8);
+    }
+    &.pick-up {
+      background: rgba($driver-color, 0.8);
+    }
+    &.no-drivers {
+      background: rgba($black, 0.8);
+      color: white;
+    }
+  }
+}
+
+.marquee {
+  font-size: 32px;
 }

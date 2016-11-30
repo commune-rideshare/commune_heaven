@@ -10,7 +10,7 @@ const gulp = require('gulp'),
   pngquant = require('imagemin-pngquant'),
   changed = require('gulp-changed'),
   parker = require('gulp-parker'),
-  fontgen = require('gulp-fontgen'),
+  // fontgen = require('gulp-fontgen'),
   browserify = require('browserify'),
   source = require('vinyl-source-stream'),
   buffer = require('vinyl-buffer'),
@@ -67,13 +67,6 @@ gulp.task('images', () => {
     .pipe(gulp.dest('img'));
 });
 
-// Generate webfonts
-gulp.task('font', function () {
-  return gulp.src("./src/fonts/*.{ttf,otf}")
-    .pipe(fontgen({
-      dest: "./fonts/"
-    }));
-});
 
 // Watch for changes in files
 gulp.task('watch', function () {
@@ -91,7 +84,6 @@ gulp.task('watch', function () {
   gulp.watch('src/img/*', ['images']);
 
   // Watch fonts
-  gulp.watch('src/fonts/*.{ttf,otf}"', ['font']);
 });
 
 // Analyze CSS
@@ -101,7 +93,7 @@ gulp.task('parker', function () {
 });
 
 // Default Task
-gulp.task('default', ['scripts', 'sass', 'watch', 'browser-sync', 'images', 'font']);
+gulp.task('default', ['scripts', 'sass', 'watch', 'browser-sync', 'images']);
 
 function sassErrorAlert(error) {
   notify.onError({

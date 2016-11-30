@@ -14,7 +14,14 @@ var config = require("./config"),
 
 var city = {
   totalShares: 0,
+  driverShares: 0,
+  riderShares: 0,
+  investorShares: 0,
+  driverPercentage: 0,
+  riderPercentage: 0,
+  investorPercentage: 0,
   totalTrips: 0,
+  investorDecay: 1,
   map: {},
   bounds: {},
   routes: [],
@@ -28,31 +35,21 @@ var city = {
     var i = 0,
       parent = this;
 
-    for (i; i < numberOfDrivers; i++) {
+      for (i; i < numberOfDrivers; i++) {
 
-      var point = {
-        latitude: chance.latitude({
-          min: this.bounds._sw.lat,
-          max: this.bounds._ne.lat,
-        }),
-        longitude: chance.longitude({
-          min: this.bounds._sw.lng,
-          max: this.bounds._ne.lng,
-        })
+        parent.drivers.push(driver(
+          [chance.longitude({
+            min: this.bounds._sw.lng,
+            max: this.bounds._ne.lng,
+          }), chance.latitude({
+            min: this.bounds._sw.lat,
+            max: this.bounds._ne.lat,
+          })],
+          chance.guid(),
+          names.getRandomName())
+        );
 
-      };
-
-      this.mapboxClient.getDirections([point, point],
-        function (err, res) {
-
-          parent.drivers.push(driver(
-            [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
-            chance.guid(),
-            names.getRandomName()));
-
-        });
-
-    }
+      }
 
   },
   spawnRiders: function spawnRiders(numberOfRiders) {
@@ -62,27 +59,17 @@ var city = {
 
     for (i; i < numberOfRiders; i++) {
 
-      var point = {
-        latitude: chance.latitude({
-          min: this.bounds._sw.lat,
-          max: this.bounds._ne.lat,
-        }),
-        longitude: chance.longitude({
+      parent.riders.push(rider(
+        [chance.longitude({
           min: this.bounds._sw.lng,
           max: this.bounds._ne.lng,
-        })
-
-      };
-
-      this.mapboxClient.getDirections([point, point],
-        function (err, res) {
-
-          parent.riders.push(rider(
-            [res.origin.geometry.coordinates[0], res.origin.geometry.coordinates[1]],
-            chance.guid(),
-            names.getRandomName()));
-
-        });
+        }), chance.latitude({
+          min: this.bounds._sw.lat,
+          max: this.bounds._ne.lat,
+        })],
+        chance.guid(),
+        names.getRandomName())
+      );
 
     }
 
@@ -116,10 +103,10 @@ var city = {
     //    this.map.setMaxBounds(zoomBounds);
 
     // Create drivers
-    this.spawnDrivers(12);
+    this.spawnDrivers(16);
 
     // Create riders
-    this.spawnRiders(30);
+    this.spawnRiders(40);
 
     //    this.map.flyTo({
     //      center: city.center,

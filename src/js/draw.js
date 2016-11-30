@@ -4,13 +4,10 @@
 // Require jQuery
 global.$ = require("jquery");
 
-var config = require("./config"),
-    mapboxgl = require('mapbox-gl'),
-    moment = require('moment'),
-    city = require("./city"),
-    speed = 100;
-
-require("moment-duration-format");
+var config = require("./config")
+var mapboxgl = require('mapbox-gl')
+var city = require("./city")
+var speed = 100
 
 var draw = {
   point: function point(id, coordinates, color) {
@@ -42,8 +39,8 @@ var draw = {
   },
   remove: function remove(id) {
 
-    city.map.removeLayer(id);
-    city.map.removeSource(id);
+    city.map.removeLayer(id)
+    city.map.removeSource(id)
 
   },
   route: function route(data, cb) {
@@ -51,10 +48,6 @@ var draw = {
     // console.log('route data', data);
 
     var newPosition = {
-        "type": "Point",
-        "coordinates": []
-      },
-      offsetPosition = {
         "type": "Point",
         "coordinates": []
       },
@@ -72,28 +65,15 @@ var draw = {
         // Animate Driver
         city.map.getSource(data.driver.id).setData(newPosition);
 
-        // console.log('NEWPOSITION', newPosition.coordinates);
-
-        // Animate Rider
-        if(data.rider && newPosition.coordinates !== undefined) {
-          offsetPosition.coordinates[0] = newPosition.coordinates[0];
-          offsetPosition.coordinates[1] = newPosition.coordinates[1] + 0.00015;
-          // console.log('new 0', newPosition.coordinates[0]);
-          console.log('new 1', newPosition.coordinates[1]);
-          // console.log('off 0', offsetPosition.coordinates[0]);
-          console.log('off 1', offsetPosition.coordinates[1]);
-          city.map.getSource(data.rider.id).setData(offsetPosition);
-        }
-
         i++;
 
         if (i > steps) {
-          console.log('trip drawn');
           clearInterval(animation);
           setTimeout(function () {
             cb();
           }, 1000);
         }
+
       }, speed);
 
       // Draw route without animation
@@ -119,7 +99,6 @@ var draw = {
         "paint": {
           "line-color": config.workColor,
           "line-width": 2,
-          //          "line-opacity": ,
           "line-dasharray": [2, 1]
         }
       });
@@ -130,26 +109,26 @@ var draw = {
 
   },
   activateDriver: function activateDriver(driverId) {
-    city.map.setPaintProperty(driverId, "circle-radius", config.activeSize);
-  },
-  workingDriver: function workingDriver(driverId) {
-    city.map.setPaintProperty(driverId, "circle-color", config.workColor);
+    city.map.setPaintProperty(driverId, "circle-radius", 20)
+    // city.map.setPaintProperty(driverId, "circle-stroke-width", 10)
+    // city.map.setPaintProperty(driverId, "circle-stroke-color ", config.driverColor)
+    city.map.setPaintProperty(driverId, "circle-color", config.driverColor)
   },
   deActivateDriver: function deActivateDriver(driverId) {
-    city.map.setPaintProperty(driverId, "circle-radius", config.normalSize);
-    city.map.setPaintProperty(driverId, "circle-color", config.activeColor);
+    city.map.setPaintProperty(driverId, "circle-radius", config.normalSize)
+    // city.map.setPaintProperty(driverId, "circle-stroke-width", 0)
+    city.map.setPaintProperty(driverId, "circle-color", config.driverColor)
   },
   waitingRider: function waitingRider(riderId) {
-    city.map.setPaintProperty(riderId, "circle-color", config.waitColor);
-  },
-  resetRider: function resetRider(riderId) {
-    city.map.setPaintProperty(riderId, "circle-color", config.riderColor);
+    city.map.setPaintProperty(riderId, "circle-color", config.waitColor)
   },
   activateRider: function activateRider(riderId) {
-    city.map.setPaintProperty(riderId, "circle-opacity", 1);
+    city.map.setPaintProperty(riderId, "circle-opacity", 1)
+    city.map.setPaintProperty(riderId, "circle-radius", 25)
   },
   deActivateRider: function deActivateRider(riderId) {
-    city.map.setPaintProperty(riderId, "circle-opacity", 0);
+    city.map.setPaintProperty(riderId, "circle-opacity", 0)
+    city.map.setPaintProperty(riderId, "circle-radius", 0)
   },
 }
 
