@@ -1,16 +1,13 @@
-/*jslint browser: true, devel: true, node: true, nomen: true, plusplus: true*/
-/*global $, jQuery*/
-
-var config = require("./config"),
-    driver = require("./driver"),
-    rider = require("./rider"),
-    mapboxgl = require('mapbox-gl'),
-    MapboxClient = require('mapbox'),
-    turf = require('turf'),
-    names = require('./names'),
-    Chance = require('chance'),
-    chance = new Chance(),
-    geohash = require('ngeohash');
+var config = require('./config')
+var driver = require('./driver')
+var rider = require('./rider')
+var mapboxgl = require('mapbox-gl')
+var MapboxClient = require('mapbox')
+var turf = require('turf')
+var names = require('./names')
+var Chance = require('chance')
+var chance = new Chance()
+var geohash = require('ngeohash')
 
 var city = {
   totalShares: 0,
@@ -30,60 +27,51 @@ var city = {
   rides: [],
   waitingList: [],
   mapboxClient: {},
-  spawnDrivers: function spawnDrivers(numberOfDrivers) {
-
+  spawnDrivers: function spawnDrivers (numberOfDrivers) {
     var i = 0,
-      parent = this;
+      parent = this
 
-      for (i; i < numberOfDrivers; i++) {
-
-        parent.drivers.push(driver(
+    for (i; i < numberOfDrivers; i++) {
+      parent.drivers.push(driver(
           [chance.longitude({
             min: this.bounds._sw.lng,
-            max: this.bounds._ne.lng,
+            max: this.bounds._ne.lng
           }), chance.latitude({
             min: this.bounds._sw.lat,
-            max: this.bounds._ne.lat,
+            max: this.bounds._ne.lat
           })],
           chance.guid(),
           names.getRandomName())
-        );
-
-      }
-
+        )
+    }
   },
-  spawnRiders: function spawnRiders(numberOfRiders) {
-
+  spawnRiders: function spawnRiders (numberOfRiders) {
     var i = 0,
-      parent = this;
+      parent = this
 
     for (i; i < numberOfRiders; i++) {
-
       parent.riders.push(rider(
         [chance.longitude({
           min: this.bounds._sw.lng,
-          max: this.bounds._ne.lng,
+          max: this.bounds._ne.lng
         }), chance.latitude({
           min: this.bounds._sw.lat,
-          max: this.bounds._ne.lat,
+          max: this.bounds._ne.lat
         })],
         chance.guid(),
         names.getRandomName())
-      );
-
+      )
     }
-
   },
-  init: function init(city, cb) {
-
+  init: function init (city, cb) {
     var parent = this,
       ne = {},
       sw = {},
-      zoomBounds = {};
+      zoomBounds = {}
 
     // Initialize the client with API key
-    mapboxgl.accessToken = config.key;
-    this.mapboxClient = new MapboxClient(config.key);
+    mapboxgl.accessToken = config.key
+    this.mapboxClient = new MapboxClient(config.key)
 
     // Create the map
     this.map = new mapboxgl.Map({
@@ -91,10 +79,10 @@ var city = {
       style: config.styleURL,
       center: city.center,
       zoom: city.zoom
-    });
+    })
 
     // Get viewport boundaries
-    this.bounds = this.map.getBounds();
+    this.bounds = this.map.getBounds()
 
     // Set limit to outward zoom
     //    sw = new mapboxgl.LngLat(this.bounds._sw.lng + 0.04, this.bounds._sw.lat + 0.04);
@@ -103,10 +91,10 @@ var city = {
     //    this.map.setMaxBounds(zoomBounds);
 
     // Create drivers
-    this.spawnDrivers(16);
+    this.spawnDrivers(16)
 
     // Create riders
-    this.spawnRiders(40);
+    this.spawnRiders(40)
 
     //    this.map.flyTo({
     //      center: city.center,
@@ -120,59 +108,59 @@ var city = {
     //    });
 
     this.map.on('load', function () {
-      cb();
-    });
-
+      cb()
+    })
   },
-  getClosestDriver: function getClosesDriver(rider) {
+  getClosestDriver: function getClosestDriver (rider, cb) {
 
     var driverPointCollection = {
-        "type": "FeatureCollection",
-        "features": []
+        'type': 'FeatureCollection',
+        'features': []
       },
-      nearestDriver = {};
+      nearestDriver = {}
 
     // Make a collection of all drivers that are not currently occupied
     this.drivers.forEach(function (driver) {
       if (driver.occupied === false) {
-        driverPointCollection.features.push(driver.point);
+        driverPointCollection.features.push(driver.point)
       }
-    });
+    })
 
-    if (driverPointCollection.features.length != 0) {
-
-      nearestDriver = turf.nearest(rider.point, driverPointCollection);
+    if (driverPointCollection.features.length !== 0) {
+      nearestDriver = turf.nearest(rider.point, driverPointCollection)
 
       for (var i = 0, iLen = this.drivers.length; i < iLen; i++) {
         if (this.drivers[i].point.geometry.coordinates === nearestDriver.geometry.coordinates) {
-          return i;
+          cb(i)
         }
       }
     } else {
-      return -1;
+      cb(null)
     }
-
   },
-  directions: function directions(start, end, cb) {
+  directions: function directions (start, end, cb) {
 
-    this.mapboxClient.getDirections([{
+    // console.log('direction start', start.point.geometry.coordinates)
+    // console.log('end ', end.point.geometry.coordinates)
+
+    if(start.point.geometry.coordinates && end.point.geometry.coordinates ) {
+
+      this.mapboxClient.getDirections([{
         latitude: start.point.geometry.coordinates[1],
         longitude: start.point.geometry.coordinates[0]
       }, {
         latitude: end.point.geometry.coordinates[1],
         longitude: end.point.geometry.coordinates[0]
       }],
-      function (err, res) {
-
-        cb({
-          route: res.routes[0],
-          routeId: chance.guid(),
-          driver: start
-        });
-
-      });
-
+        function (err, res) {
+          cb({
+            route: res.routes[0],
+            routeId: chance.guid(),
+            driver: start
+          })
+        })
+    }
   }
-};
+}
 
-module.exports = city;
+module.exports = city

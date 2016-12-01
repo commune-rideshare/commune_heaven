@@ -1,21 +1,15 @@
-/*jslint browser: true, devel: true, node: true, nomen: true, plusplus: true*/
-/*global $, jQuery*/
+var config = require('./config')
 
-"use strict";
-
-var config = require("./config");
-
-function rider(startPosition, id, name) {
-
+function rider (startPosition, id, name) {
   return {
     point: {
-      "type": "Feature",
-      "properties": {
-        "marker-color": config.riderColor
+      'type': 'Feature',
+      'properties': {
+        'marker-color': config.riderColor
       },
-      "geometry": {
-        "type": "Point",
-        "coordinates": startPosition
+      'geometry': {
+        'type': 'Point',
+        'coordinates': startPosition
       }
     },
     id: id,
@@ -26,7 +20,6 @@ function rider(startPosition, id, name) {
     waiting: false,
     inTransit: false
   }
-
 }
 
-module.exports = rider;
+module.exports = rider

@@ -24,8 +24,8 @@ gulp.task('scripts', function () {
     })
     .bundle()
     .pipe(source('app.min.js'))
-    .pipe(buffer())
-//    .pipe(uglify())
+    // .pipe(buffer())
+    // .pipe(uglify())
     .pipe(gulp.dest('./'))
     .pipe(browserSync.stream());
 
@@ -67,6 +67,13 @@ gulp.task('images', () => {
     .pipe(gulp.dest('img'));
 });
 
+// Generate webfonts
+gulp.task('font', function () {
+  return gulp.src("./src/fonts/*.{ttf,otf}")
+    .pipe(fontgen({
+      dest: "./fonts/"
+    }));
+});
 
 // Watch for changes in files
 gulp.task('watch', function () {
@@ -84,6 +91,7 @@ gulp.task('watch', function () {
   gulp.watch('src/img/*', ['images']);
 
   // Watch fonts
+  // gulp.watch('src/fonts/*.{ttf,otf}"', ['font']);
 });
 
 // Analyze CSS

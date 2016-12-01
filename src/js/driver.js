@@ -1,21 +1,17 @@
-/*jslint browser: true, devel: true, node: true, nomen: true, plusplus: true*/
-/*global $, jQuery*/
+'use strict'
 
-"use strict";
+var config = require('./config')
 
-var config = require("./config");
-
-function driver(startPosition, id, name) {
-
+function driver (startPosition, id, name) {
   return {
     point: {
-      "type": "Feature",
-      "properties": {
-        "marker-color": config.driverColor
+      'type': 'Feature',
+      'properties': {
+        'marker-color': config.driverColor
       },
-      "geometry": {
-        "type": "Point",
-        "coordinates": startPosition
+      'geometry': {
+        'type': 'Point',
+        'coordinates': startPosition
       }
     },
     id: id,
@@ -26,7 +22,6 @@ function driver(startPosition, id, name) {
     occupied: false,
     passengerList: []
   }
-
 }
 
-module.exports = driver;
+module.exports = driver

@@ -1,6 +1,3 @@
-/*jslint browser: true, devel: true, node: true, nomen: true, plusplus: true*/
-/*global $, jQuery*/
-
 var cities = [
   {
     text: 'Hong Kong',
@@ -23,6 +20,6 @@ var cities = [
     center: [4.8845038, 52.3701256],
     zoom: 14
   }
-];
+]
 
-module.exports = cities;
+module.exports = cities
